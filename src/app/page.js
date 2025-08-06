@@ -189,200 +189,226 @@ export default function Home() {
   return (
     <>
     
-    <div className="group relative w-full h-[199px] md:h-[219px] lg:h-[227px] overflow-hidden">
-      {/* Slides Container */}
+    <div className="group relative w-full h-[199px] md:h-[219px] lg:h-[227px] overflow-hidden font-helveticaBoldCondensed">
+
+  {/* Slides Container */}
+  <div
+    className="flex transition-transform duration-500 ease-in-out h-full"
+    style={{ transform: `translateX(-${currentSlide * 100}%)` }}
+    onMouseEnter={() => setIsAutoPlaying(false)}
+    onMouseLeave={() => setIsAutoPlaying(true)}
+  >
+    {slides.map((slide, index) => (
       <div
-        className="flex transition-transform duration-500 ease-in-out h-full"
-        style={{ transform: `translateX(-${currentSlide * 100}%)` }}
-        onMouseEnter={() => setIsAutoPlaying(false)}
-        onMouseLeave={() => setIsAutoPlaying(true)}
+        key={slide.id}
+        className={`min-w-full h-full relative flex items-center bg-cover bg-center`}
+        style={{ backgroundImage: `url(${slide.image})` }}
       >
-        {slides.map((slide, index) => (
-          <div key={slide.id} className={`min-w-full h-full  relative flex items-center bg-cover bg-center`}  style={{ backgroundImage: `url(${slide.image})` }}>
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center h-full">
-                {/* Left Content */}
-                <div className="text-white space-y-4 z-10">
-                  <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">{slide.title}</h1>
-                  <p className="text-base md:text-lg leading-relaxed opacity-90">{slide.subtitle}</p>
-                  <div className="pt-2">
-                    <a
-                      href={slide.buttonLink}
-                      className="inline-block bg-white text-gray-800 font-semibold px-6 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
-                    >
-                      {slide.buttonText}
-                    </a>
-                  </div>
-                </div>
-
-                
-                
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center h-full">
+            {/* Left Content */}
+            <div className="text-white space-y-4 z-10 drop-shadow-lg">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
+                {slide.title}
+              </h1>
+              <p className="text-base md:text-lg leading-relaxed opacity-90">
+                {slide.subtitle}
+              </p>
+              <div className="pt-2">
+                <a
+                  href={slide.buttonLink}
+                  className="inline-block bg-white text-[#006294] font-bold px-6 py-2 rounded-lg 
+                             hover:bg-[#C09200] hover:text-white transition-colors duration-200 shadow-md hover:shadow-xl transform hover:scale-105"
+                >
+                  {slide.buttonText}
+                </a>
               </div>
             </div>
-
-            {/* Decorative Elements */}
-            <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/10 to-transparent"></div>
           </div>
-        ))}
-      </div>
-
-      {/* Navigation Arrows - Show on Hover */}
-      <button
-        onClick={prevSlide}
-        className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300 backdrop-blur-sm opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0"
-        aria-label="Previous slide"
-      >
-        <ChevronLeft className="w-6 h-6" />
-      </button>
-
-      <button
-        onClick={nextSlide}
-        className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-2 rounded-full transition-all duration-300 backdrop-blur-sm opacity-0 group-hover:opacity-100 translate-x-[10px] group-hover:translate-x-0"
-        aria-label="Next slide"
-      >
-        <ChevronRight className="w-6 h-6" />
-      </button>
-
-      {/* Slide Indicators - Show on Hover */}
-      <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        {slides.map((_, index) => (
-          <button
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`w-3 h-3 rounded-full transition-all duration-200 ${
-              index === currentSlide ? "bg-white scale-110" : "bg-white/50 hover:bg-white/70"
-            }`}
-            aria-label={`Go to slide ${index + 1}`}
-          />
-        ))}
-      </div>
-
-      {/* Progress Bar - Show on Hover */}
-      <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-        <div
-          className="h-full bg-white transition-all duration-100 ease-linear"
-          style={{
-            width: `${((currentSlide + 1) / slides.length) * 100}%`,
-          }}
-        />
-      </div>
-    </div>
-    <section className="py-12 my-[80px] bg-white">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl text-[#006699] font-bold text-center mb-10">
-          Les Best-Sellers PackSpace
-        </h2>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product, index) => (
-            <div key={index} className="bg-white rounded  p-4">
-              <div className="aspect-square overflow-hidden rounded mb-4">
-                <Link href={product.url}>
-                  <img
-                    src={product.img}
-                    alt={product.title}
-                    className="object-cover w-full h-full transition-transform hover:scale-105 duration-300"
-                  />
-                </Link>
-              </div>
-              <div className="text-center space-y-1 h-[100px]">
-                <h3 className="text-md font-semibold text-[#58595a]">
-                  <Link href={product.url}>{product.title}</Link>
-                </h3>
-                <div className="text-sm text-gray-700">
-                  à partir de{" "}
-                  <strong className="text-[#006699]">{product.price}</strong>{" "}
-                  {product.unit}
-                </div>
-                <div className="text-xs font-semibold text-[#F6C241]">
-                  {product.desc}
-                </div>
-              </div>
-            </div>
-          ))}
         </div>
-      </div>
-    </section>
-    <div className="container mx-auto px-4 py-12">
-      <h2 className="text-3xl font-bold text-center text-[#006699] mb-10">Nos Catégories</h2>
 
-      <div className="flex flex-wrap justify-center gap-6">
-        {categories.map((cat) => (
-          <div
-            key={cat.slug}
-            className="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 flex flex-col items-center"
-          >
-            <Link
-              href={`/category/${cat.slug}`}
-              className="block w-full aspect-square overflow-hidden rounded-lg shadow-md group"
-            >
-              <Image
-                src={cat.img}
-                alt={cat.name}
-                width={300}
-                height={300}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        {/* Gradient Overlay */}
+        <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-black/30 to-transparent"></div>
+      </div>
+    ))}
+  </div>
+
+  {/* Navigation Arrows - Show on Hover */}
+  <button
+    onClick={prevSlide}
+    className="absolute left-4 top-1/2 transform -translate-y-1/2
+               bg-white/30 hover:bg-[#006294] hover:text-white text-[#006294]
+               p-2 rounded-full transition-all duration-300 backdrop-blur-sm
+               opacity-0 group-hover:opacity-100 translate-x-[-10px] group-hover:translate-x-0"
+    aria-label="Previous slide"
+  >
+    <ChevronLeft className="w-6 h-6" />
+  </button>
+
+  <button
+    onClick={nextSlide}
+    className="absolute right-4 top-1/2 transform -translate-y-1/2
+               bg-white/30 hover:bg-[#006294] hover:text-white text-[#006294]
+               p-2 rounded-full transition-all duration-300 backdrop-blur-sm
+               opacity-0 group-hover:opacity-100 translate-x-[10px] group-hover:translate-x-0"
+    aria-label="Next slide"
+  >
+    <ChevronRight className="w-6 h-6" />
+  </button>
+
+  {/* Slide Indicators - Show on Hover */}
+  <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 flex space-x-2
+                  opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+    {slides.map((_, index) => (
+      <button
+        key={index}
+        onClick={() => goToSlide(index)}
+        className={`w-3 h-3 rounded-full transition-all duration-200 ${
+          index === currentSlide
+            ? "bg-white scale-110 shadow-lg"
+            : "bg-white/50 hover:bg-white/80"
+        }`}
+        aria-label={`Go to slide ${index + 1}`}
+      />
+    ))}
+  </div>
+
+  {/* Progress Bar - Show on Hover */}
+  <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+    <div
+      className="h-full bg-white transition-all duration-100 ease-linear"
+      style={{
+        width: `${((currentSlide + 1) / slides.length) * 100}%`,
+      }}
+    />
+  </div>
+</div>
+
+<section className="py-12 my-[80px] bg-white font-helveticaBoldCondensed">
+  <div className="container mx-auto px-4">
+    <h2 className="text-3xl text-[#006294] font-bold text-center mb-10">
+      Les Best-Sellers PackSpace
+    </h2>
+
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {products.map((product, index) => (
+        <div
+          key={index}
+          className="bg-white  p-4   duration-300"
+        >
+          <div className="aspect-square overflow-hidden  mb-4">
+            <Link href={product.url} className="block">
+              <img
+                src={product.img}
+                alt={product.title}
+                className="object-cover w-full h-full transition-transform hover:scale-105 duration-300 "
               />
             </Link>
-            <h3 className="mt-4 text-center text-lg font-semibold text-[#58595a]">
-              <Link href={`/category/${cat.slug}`}>{cat.name}</Link>
-            </h3>
           </div>
-        ))}
-      </div>
+          <div className="text-center space-y-1 h-[100px]">
+            <h3 className="text-md font-semibold text-[#333333]">
+              <Link href={product.url} className="hover:text-[#006294] transition-colors duration-200">
+                {product.title}
+              </Link>
+            </h3>
+            <div className="text-sm text-gray-700">
+              à partir de{" "}
+              <strong className="text-[#006294] font-bold">{product.price}</strong>{" "}
+              {product.unit}
+            </div>
+            <div className="text-xs font-semibold text-[#C09200]">
+              {product.desc}
+            </div>
+          </div>
+        </div>
+      ))}
     </div>
-    <section id="newsletter" className="bg-gray-100 border-t border-[#006699] py-12">
-      <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
-        <div className="md:w-1/3 mb-6 md:mb-0">
-          {/* <Image
-            src="/boite.png"
-            alt="Newsletter"
-            width={200}
-            height={200}
-            className="mx-auto"
-          /> */}
-          <img  src="/boite.png" alt="Newsletter" width={200}
-            height={200} />
-        </div>
-        <div className="md:w-2/3 text-right">
-          <h2 className="text-2xl text-[#07bef9] font-semibold mb-2">
-            Inscrivez-vous à notre Newsletter.
-          </h2>
-          <p className="text-gray-700 mb-4 font-medium">
-            et recevez toutes les nouveautés, inspirations, promotions...
-          </p>
+  </div>
+</section>
 
-          <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 items-center">
-            <input
-              type="email"
-              placeholder="Saisissez votre email ici"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#07bef9]"
-            />
-            <button
-              type="submit"
-              className="bg-[#de0067] text-white px-6 py-2 rounded-md font-bold hover:bg-pink-700 transition-colors"
-            >
-              ENVOYER
-            </button>
-          </form>
+<div className="container mx-auto px-4 py-12 font-helveticaBoldCondensed">
+  <h2 className="text-3xl font-bold text-center text-[#006294] mb-10">
+    Nos Catégories
+  </h2>
 
-          {success && (
-            <p className="mt-4 text-green-600 text-sm">
-              Merci ! Votre inscription a bien été prise en compte.
-            </p>
-          )}
-
-          {error && (
-            <p className="mt-4 text-red-600 text-sm">
-              {error}
-            </p>
-          )}
-        </div>
+  <div className="flex flex-wrap justify-center gap-6">
+    {categories.map((cat) => (
+      <div
+        key={cat.slug}
+        className="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 flex flex-col items-center"
+      >
+        <Link
+          href={`/category/${cat.slug}`}
+          className="block w-full aspect-square overflow-hidden   group transition-shadow duration-300 hover:shadow-xl"
+        >
+          <Image
+            src={cat.img}
+            alt={cat.name}
+            width={300}
+            height={300}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 "
+          />
+        </Link>
+        <h3 className="mt-4 text-center text-lg font-semibold text-[#333333]">
+          <Link href={`/category/${cat.slug}`} className="hover:text-[#006294] transition-colors duration-200">
+            {cat.name}
+          </Link>
+        </h3>
       </div>
-    </section>
+    ))}
+  </div>
+</div>
+
+<section
+  id="newsletter"
+  className="bg-[#FFFFFF] border-t border-[#006294] py-12 font-helveticaCondensed"
+>
+  <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
+    <div className="md:w-1/3 mb-6 md:mb-0 flex justify-center md:justify-start">
+      <img src="/boite.png" alt="Newsletter" width={200} height={200} />
+    </div>
+    <div className="md:w-2/3 text-right">
+      <h2 className="text-2xl text-[#006294] font-semibold mb-2">
+        Inscrivez-vous à notre Newsletter.
+      </h2>
+      <p className="text-[#58595a] mb-4 font-medium">
+        et recevez toutes les nouveautés, inspirations, promotions...
+      </p>
+
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col md:flex-row gap-4 items-center"
+      >
+        <input
+          type="email"
+          placeholder="Saisissez votre email ici"
+          required
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          className="flex-1 px-4 py-2 border border-[#006294] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C09200] transition"
+        />
+        <button
+          type="submit"
+          className="bg-[#C09200] text-[#FFFFFF] px-6 py-2 rounded-md font-semibold hover:bg-[#006294] hover:text-[#C09200] transition-colors duration-300"
+        >
+          ENVOYER
+        </button>
+      </form>
+
+      {success && (
+        <p className="mt-4 text-[#006294] text-sm font-semibold">
+          Merci ! Votre inscription a bien été prise en compte.
+        </p>
+      )}
+
+      {error && (
+        <p className="mt-4 text-red-600 text-sm font-semibold">{error}</p>
+      )}
+    </div>
+  </div>
+</section>
+
+
             </>
   )
 }
