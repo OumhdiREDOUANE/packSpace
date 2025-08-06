@@ -128,7 +128,7 @@ export default function Footer() {
               </a>
             </div>
           </div>
-          <div className="flex">
+          <div className="grid grid-cols-2 gap-3">
         <div className="text-center py-4 border-t border-gray-200">
             <p className="text-gray-600 text-sm mb-4">Nos services dédiés aux entreprises</p>
             <div className="space-y-2">

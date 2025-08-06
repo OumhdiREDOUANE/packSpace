@@ -38,7 +38,7 @@ useEffect(() => {
 
     return (
         <>
-         <nav className=" hidden md:block bg-white border-b border-gray-300 sticky top-0 z-40">
+         <nav className=" hidden md:block bg-white border-b border-gray-300 sticky top-0 z-50">
         
       <div className="  max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center items-center h-16">
@@ -104,7 +104,7 @@ useEffect(() => {
         </div>
       </div>
    </nav>
-   {isMobileMenuOpen&&<nav className="bg-white border-b border-gray-300 sticky top-0 z-40">
+   {isMobileMenuOpen&&<nav className="bg-white border-b border-gray-300 sticky top-0 z-50">
    <div
         className={`md:hidden bg-white border-t border-gray-200 transition-all duration-300 ease-in-out 
         max-h-screen opacity-100"

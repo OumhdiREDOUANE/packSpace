@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-
+import Image from 'next/image';
+import Link from 'next/link';
 const slides = [
   {
     id: 1,
@@ -11,7 +12,7 @@ const slides = [
     buttonText: "Découvrez tous nos produits",
     buttonLink: "#",
     backgroundColor: "bg-gradient-to-r from-pink-500 to-pink-600",
-    image: "/hero-slider.png",
+    image: "/slide1.jpg",
   },
   {
     id: 2,
@@ -20,7 +21,7 @@ const slides = [
     buttonText: "Voir nos services",
     buttonLink: "#",
     backgroundColor: "bg-gradient-to-r from-blue-500 to-blue-600",
-    image: "/hero-slider.png",
+    image: "/slide2.jpg",
   },
   {
     id: 3,
@@ -29,14 +30,139 @@ const slides = [
     buttonText: "Commander maintenant",
     buttonLink: "#",
     backgroundColor: "bg-gradient-to-r from-purple-500 to-purple-600",
-    image: "/hero-slider.png",
+    image: "/slide3.jpg",
   },
 ]
+const products = [
+  {
+    title: "Cartes de visite",
+    url: "/category/cartes-de-visite",
+    img: "/CV_Cat_300x300.jpg",
+    price: "89,90 Dhs HT",
+    unit: "les 100 ex.",
+    desc: "L'indispensable de tous professionnels",
+  },
+  {
+    title: "Dépliants",
+    url: "/category/depliants",
+    img: "/DEP_Cat_300x300.jpg",
+    price: "179,90 Dhs HT",
+    unit: "les 100 ex.",
+    desc: "La com au meilleur rapport qualité-prix",
+  },
+  {
+    title: "Flyers",
+    url: "/product/flyer",
+    img: "/FLY_Cat_300x300.jpg",
+    price: "417,80 Dhs HT",
+    unit: "les 100 ex.",
+    desc: "Le classique de la communication",
+  },
+  {
+    title: "Sacs en papier",
+    url: "/product/Sacs-de-luxe",
+    img: "/SPL_Cat_300x300.jpg",
+    price: "949,90 Dhs HT",
+    unit: "les 50 ex.",
+    desc: "Pratique et élégant",
+  },
+  {
+    title: "Menus",
+    url: "/category/menu",
+    img: "/Menu_Cat_300x300.jpg",
+    price: "69,90 Dhs HT",
+    unit: "les 50 ex.",
+    desc: "Pour tous les goûts !",
+  },
+  {
+    title: "Etuis pliants",
+    url: "/category/etuis-pliants",
+    img: "/ETUP_Cat_300x300.jpg",
+    price: "349,90 Dhs HT",
+    unit: "les 100 ex.",
+    desc: "Packaging de qualité au meilleur prix",
+  },
+  {
+    title: "Roll-ups",
+    url: "/product/roll-upsweprintma",
+    img: "/ROL_Cat_300x300.jpg",
+    price: "788,00 Dhs HT",
+    unit: "l'unité",
+    desc: "Affichez-vous en qualité premium",
+  },
+  {
+    title: "T-shirts Mixtes",
+    url: "/product/T-shirts-Mixtes",
+    img: "/TSM_Cat_300x300.jpg",
+    price: "178,50 Dhs HT",
+    unit: "l'unité",
+    desc: "Vêtement de travail ou cadeau",
+  },
+]; 
+const categories = [
+  {
+    name: "Carterie",
+    slug: "carterie",
+    img: "/Carterie_Cat_300x300.jpg",
+  },
+  {
+    name: "Papeterie",
+    slug: "papeterie",
+    img: "/Papeterie_Cat_300x300.jpg",
+  },
+  {
+    name: "Communication",
+    slug: "communication",
+    img: "/Com_Cat_300x300.jpg",
+  },
+  {
+    name: "Hôtellerie Restauration",
+    slug: "hotellerie-restauration",
+    img: "/HotellerieResto_Cat_300x300.jpg",
+  },
+  {
+    name: "Packaging",
+    slug: "packaging",
+    img: "/Packaging_Cat_300x300.jpg",
+  },
+  
+];
+
 
 export default function Home() {
   const [currentSlide, setCurrentSlide] = useState(0)
   const [isAutoPlaying, setIsAutoPlaying] = useState(true)
+  const [email, setEmail] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [error, setError] = useState("");
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSuccess(false);
+    setError("");
+
+    try {
+      const res = await fetch(
+        "https://8f66f120.sibforms.com/serve/MUIEAHAEJVaLKICpv8v63ir3Th99jR9aXe-17_fQKVQbB8m_Q73342xUKk6Tk2l0weR5u6nNYsiX7JK07z4ndKFMbjCVfowIiu-EvlMQnWZwnzct_CXOw70OCz2jDlaM7Ktc4KVfCePUWQw_8YRLCs8FC38_LskuwKJlv1OvXhQc_ocH1sAJO9uyGRY9NHr6karp6elLFgXF7oDb",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: new URLSearchParams({ EMAIL: email }).toString(),
+        }
+      );
+
+      if (res.ok) {
+        setSuccess(true);
+        setEmail("");
+      } else {
+        setError("Votre abonnement n'a pas pu être enregistré. Veuillez réessayer.");
+      }
+    } catch (err) {
+      setError("Une erreur est survenue. Veuillez réessayer.");
+    }
+  };
   // Auto-play functionality
   useEffect(() => {
     if (!isAutoPlaying) return
@@ -61,6 +187,8 @@ export default function Home() {
   }
 
   return (
+    <>
+    
     <div className="group relative w-full h-[199px] md:h-[219px] lg:h-[227px] overflow-hidden">
       {/* Slides Container */}
       <div
@@ -70,7 +198,7 @@ export default function Home() {
         onMouseLeave={() => setIsAutoPlaying(true)}
       >
         {slides.map((slide, index) => (
-          <div key={slide.id} className={`min-w-full h-full ${slide.backgroundColor} relative flex items-center`}>
+          <div key={slide.id} className={`min-w-full h-full  relative flex items-center bg-cover bg-center`}  style={{ backgroundImage: `url(${slide.image})` }}>
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center h-full">
                 {/* Left Content */}
@@ -87,32 +215,8 @@ export default function Home() {
                   </div>
                 </div>
 
-                {/* Right Content - Image */}
-                <div className="relative h-full flex items-center justify-center">
-                  <div className="relative w-full h-full max-w-lg">
-                    {/* Scattered Print Materials Effect */}
-                    <div className="absolute inset-0 overflow-hidden">
-                      {/* Simulated scattered print materials */}
-                      <div className="absolute top-10 right-10 w-20 h-12 bg-white rounded shadow-lg transform rotate-12 opacity-90"></div>
-                      <div className="absolute top-20 left-10 w-16 h-10 bg-blue-400 rounded shadow-lg transform -rotate-6 opacity-80"></div>
-                      <div className="absolute top-32 right-20 w-18 h-12 bg-yellow-300 rounded shadow-lg transform rotate-45 opacity-85"></div>
-                      <div className="absolute top-40 left-20 w-22 h-14 bg-green-400 rounded shadow-lg transform -rotate-12 opacity-90"></div>
-                      <div className="absolute top-16 center w-24 h-16 bg-red-400 rounded shadow-lg transform rotate-6 opacity-80"></div>
-                      <div className="absolute bottom-20 right-16 w-20 h-12 bg-purple-400 rounded shadow-lg transform -rotate-24 opacity-85"></div>
-                      <div className="absolute bottom-32 left-12 w-18 h-11 bg-orange-400 rounded shadow-lg transform rotate-18 opacity-90"></div>
-                      <div className="absolute bottom-40 right-8 w-16 h-10 bg-teal-400 rounded shadow-lg transform -rotate-8 opacity-80"></div>
-
-                      {/* Additional scattered elements */}
-                      <div className="absolute top-24 right-32 w-14 h-9 bg-indigo-400 rounded shadow-lg transform rotate-30 opacity-75"></div>
-                      <div className="absolute top-48 left-8 w-19 h-13 bg-pink-300 rounded shadow-lg transform -rotate-15 opacity-85"></div>
-                      <div className="absolute bottom-16 center w-17 h-11 bg-cyan-400 rounded shadow-lg transform rotate-22 opacity-80"></div>
-                      <div className="absolute bottom-48 right-24 w-21 h-13 bg-lime-400 rounded shadow-lg transform -rotate-18 opacity-90"></div>
-                    </div>
-
-                    {/* Main hero image overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-l from-transparent to-black/10 rounded-lg"></div>
-                  </div>
-                </div>
+                
+                
               </div>
             </div>
 
@@ -163,5 +267,122 @@ export default function Home() {
         />
       </div>
     </div>
+    <section className="py-12 my-[80px] bg-white">
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl text-[#006699] font-bold text-center mb-10">
+          Les Best-Sellers PackSpace
+        </h2>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {products.map((product, index) => (
+            <div key={index} className="bg-white rounded  p-4">
+              <div className="aspect-square overflow-hidden rounded mb-4">
+                <Link href={product.url}>
+                  <img
+                    src={product.img}
+                    alt={product.title}
+                    className="object-cover w-full h-full transition-transform hover:scale-105 duration-300"
+                  />
+                </Link>
+              </div>
+              <div className="text-center space-y-1 h-[100px]">
+                <h3 className="text-md font-semibold text-[#58595a]">
+                  <Link href={product.url}>{product.title}</Link>
+                </h3>
+                <div className="text-sm text-gray-700">
+                  à partir de{" "}
+                  <strong className="text-[#006699]">{product.price}</strong>{" "}
+                  {product.unit}
+                </div>
+                <div className="text-xs font-semibold text-[#F6C241]">
+                  {product.desc}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+    <div className="container mx-auto px-4 py-12">
+      <h2 className="text-3xl font-bold text-center text-[#006699] mb-10">Nos Catégories</h2>
+
+      <div className="flex flex-wrap justify-center gap-6">
+        {categories.map((cat) => (
+          <div
+            key={cat.slug}
+            className="w-1/2 sm:w-1/3 md:w-1/4 lg:w-1/5 flex flex-col items-center"
+          >
+            <Link
+              href={`/category/${cat.slug}`}
+              className="block w-full aspect-square overflow-hidden rounded-lg shadow-md group"
+            >
+              <Image
+                src={cat.img}
+                alt={cat.name}
+                width={300}
+                height={300}
+                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </Link>
+            <h3 className="mt-4 text-center text-lg font-semibold text-[#58595a]">
+              <Link href={`/category/${cat.slug}`}>{cat.name}</Link>
+            </h3>
+          </div>
+        ))}
+      </div>
+    </div>
+    <section id="newsletter" className="bg-gray-100 border-t border-[#006699] py-12">
+      <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
+        <div className="md:w-1/3 mb-6 md:mb-0">
+          {/* <Image
+            src="/boite.png"
+            alt="Newsletter"
+            width={200}
+            height={200}
+            className="mx-auto"
+          /> */}
+          <img  src="/boite.png" alt="Newsletter" width={200}
+            height={200} />
+        </div>
+        <div className="md:w-2/3 text-right">
+          <h2 className="text-2xl text-[#07bef9] font-semibold mb-2">
+            Inscrivez-vous à notre Newsletter.
+          </h2>
+          <p className="text-gray-700 mb-4 font-medium">
+            et recevez toutes les nouveautés, inspirations, promotions...
+          </p>
+
+          <form onSubmit={handleSubmit} className="flex flex-col md:flex-row gap-4 items-center">
+            <input
+              type="email"
+              placeholder="Saisissez votre email ici"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#07bef9]"
+            />
+            <button
+              type="submit"
+              className="bg-[#de0067] text-white px-6 py-2 rounded-md font-bold hover:bg-pink-700 transition-colors"
+            >
+              ENVOYER
+            </button>
+          </form>
+
+          {success && (
+            <p className="mt-4 text-green-600 text-sm">
+              Merci ! Votre inscription a bien été prise en compte.
+            </p>
+          )}
+
+          {error && (
+            <p className="mt-4 text-red-600 text-sm">
+              {error}
+            </p>
+          )}
+        </div>
+      </div>
+    </section>
+            </>
   )
 }
