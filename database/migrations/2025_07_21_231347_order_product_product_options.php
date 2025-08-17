@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('order_product_product_option', function (Blueprint $table) {
+        Schema::create('order_product_product_options', function (Blueprint $table) {
     $table->unsignedBigInteger('order_product_id');
     $table->unsignedBigInteger('product_option_id');
 
     $table->foreign('order_product_id')->references('id_orderProduct')->on('order_products')->onDelete('cascade');
     $table->foreign('product_option_id')->references('id_ProductOption')->on('product_options')->onDelete('cascade');
 
-    // للتأكد أن كل خيار لا يتكرر داخل نفس الطلب
+    
     
     $table->timestamps();
     }
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('order_product_product_option');
+        Schema::dropIfExists('order_product_product_options');
     }
 };

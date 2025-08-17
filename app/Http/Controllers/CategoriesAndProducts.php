@@ -39,9 +39,11 @@ class CategoriesAndProducts extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $name)
     {
-        $productsOfCategorie = Categorie::with('products.images')->findOrFail($id);
+        $productsOfCategorie = Categorie::where('name_categorie', $name)
+        ->with('products.images')
+        ->firstOrFail();
    
       return  ProductsOfCategorieResource::collection($productsOfCategorie->products);
         

@@ -7,7 +7,10 @@ use App\Models\Categorie;
 use App\Http\Resources\proprieterResource;
 use App\Http\Resources\ImageProductResource;
 
+use Illuminate\Http\Request;
+use App\Models\OrderProduct;
 
+use App\Models\OrderProductProductOption;
 
 class ProductController extends Controller
 {
@@ -35,9 +38,13 @@ class ProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show($name)
 {
-    $product = Product::with('productOptions.option.proprieter')->findOrFail($id);
+    
+    $product = Product::with('productOptions.option.proprieter')
+    ->where('name_product', $name)
+    ->firstOrFail();
+    
 
     // Extraire les propriétaires avec leurs options via les productOptions
     $grouped = [];
@@ -57,6 +64,7 @@ class ProductController extends Controller
             ];
         }
         $option->prix_optionOfProduct = $productOption->prix;
+        $option->id_ProductOption = $productOption->id_ProductOption;
         $grouped[$id]['options'][] = $option;
     }
     $images = Product::with('images')->findOrFail($id);
@@ -71,6 +79,33 @@ class ProductController extends Controller
             return new proprieterResource($item);
         })
     ]);
+}
+public function store(Request $request)
+{
+    $validated = [];
+
+    // تمر على كل مجموعة خيارات حسب propriétaire
+    foreach ($request->all() as $key => $value) {
+        if (strpos($key, 'selected_option_') === 0) {
+            $validated[$key] = $value;
+        }
+    }
+    $order = OrderProduct::create([
+        'session_user' => session()->getId()
+    ]);
+     foreach ($validated as $productOptionId) {
+        $order_product_product_option = OrderProductProductOption::create([
+            'product_option_id' => $productOptionId,
+            'order_product_id' => $order->id_orderProduct
+        ]);
+    }
+
+    return response()->json([
+        "success" => true,
+        "order" => $order_product_product_option,
+        "options" => $validated
+    ], 201);
+    
 }
 
 //     public function show($id)

@@ -18,7 +18,8 @@ class OptionResource extends JsonResource
         return [
             'id_option'=>$this->id_option,
             'name_option'=>$this->name_option,
-            'prix_optionOfProduct'=>$this->prix,
+            'prix_optionOfProduct'=>$this->prix_optionOfProduct,
+            'id_ProductOption'=>$this->id_ProductOption,
             "image_option"=>$this->image_option,
         ];
     }

@@ -62,28 +62,7 @@ class PanierController extends Controller
      * Store a newly created resource in storage.
      */
 
-    public function store(Request $request)
-    {
-        $validated = [];
-
-        // تمر على كل مجموعة خيارات حسب propriétaire
-        foreach ($request->all() as $key => $value) {
-            if (strpos($key, 'selected_option_') === 0) {
-                $validated[$key] = $value;
-            }
-        }
-        $order = OrderProduct::create([
-            'session_user' => session()->getId()
-        ]);
-        foreach ($validated as $productOptionId) {
-            $order_product_product_options =  order_product_product_options::create([
-                'product_option_id' => $productOptionId,
-                'order_product_id' => $order->id_orderProduct
-            ]);
-        }
-
-        return  response()->json($order_product_product_options, 201);
-    }
+   
 
 
     /**

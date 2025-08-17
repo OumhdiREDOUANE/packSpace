@@ -15,6 +15,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 Route::apiResource('/categories', CategoriesAndProducts::class);
 Route::apiResource('/product', ProductController::class);
+Route::post('/product', [ProductController::class,"store"]);
 Route::apiResource('/cart', PanierController::class);
 Route::post('/cart/valider-panier', [PanierController::class, 'valider'])->middleware(['auth:sanctum', 'verified']);;
 
