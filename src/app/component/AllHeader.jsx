@@ -3,7 +3,7 @@ import Header from "./Header";
 
 export default async function AllHeader(){
   const res = await fetch('http://127.0.0.1:8000/api/categories', {
-    { next: { revalidate: 60 } } // ISR: إعادة التوليد كل 60 ثانية
+    next: { revalidate: 60 }  // ISR: إعادة التوليد كل 60 ثانية
   });
   const response = await res.json();
   

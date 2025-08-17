@@ -1,8 +1,8 @@
 // app/category/page.tsx (أو أي ملف jsx/tsx حسب المسار)
 
-async function fetchProductsByCategory(name) {
+async function fetchProductsByCategory({name}) {
     const res = await fetch(`http://127.0.0.1:8000/api/categories/${name}`, {
-      { next: { revalidate: 60 } }// لإلغاء التخزين المؤقت أثناء التطوير، احذف أو غيّر حسب الحاجة
+     next: { revalidate: 60 } // لإلغاء التخزين المؤقت أثناء التطوير، احذف أو غيّر حسب الحاجة
     });
   
     if (!res.ok) {
@@ -13,7 +13,7 @@ async function fetchProductsByCategory(name) {
     return response.data || [];
   }
 export default async function CategoryPage({params}) {
- const { name } = params;
+ const { name } = await params;
 
   let products = [];
   try {
@@ -32,7 +32,7 @@ export default async function CategoryPage({params}) {
        className="w-full h-auto object-cover "
      />
    </div>
-      <h6 className="text-[#006294] text-2xl text-center font-semibold my-[36px] tracking-wide">{name=='h%C3%B4tellerie-restauration'?"Hôtellerie / Restauration":item.name}</h6>
+      <h6 className="text-[#006294] text-2xl text-center font-semibold my-[36px] tracking-wide">{name=='h%C3%B4tellerie-restauration'?"Hôtellerie / Restauration":name}</h6>
 
       {products.length === 0 ? (
         <p>Aucun produit trouvé dans cette catégorie.</p>

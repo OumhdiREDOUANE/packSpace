@@ -22,7 +22,7 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} overflow-x-hidden px-[66px] py-3 antialiased`}
       >
      <AllHeader/>
         {children}

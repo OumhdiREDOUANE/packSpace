@@ -38,7 +38,7 @@ useEffect(() => {
 
     return (
         <>
-        <nav className="hidden md:block bg-white border-b border-gray-200 sticky top-0 z-50 font-['Helvetica Neue','Arial','sans-serif']">
+        <nav className="hidden md:block bg-white  sticky top-0 z-50 font-['Helvetica Neue','Arial','sans-serif']">
   <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div className="flex justify-center items-center h-16">
       {/* Desktop Navigation */}
