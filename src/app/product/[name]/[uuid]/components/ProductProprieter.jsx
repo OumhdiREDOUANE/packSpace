@@ -1,12 +1,13 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+import { useParams, usePathname } from "next/navigation";
 import Cookies  from "js-cookie" ;
 const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
   const router = useRouter();
 
-  
+  const params = useParams(); 
+  const pathname = usePathname();
   const [selectedFormats, setSelectedFormats] = useState([]);
   const [prixUnitaire, setprixUnitaire] = useState(null);
   const [ancienPrix, setAncienPrix] = useState(null);
@@ -14,11 +15,39 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
   const [economie, setEconomie] = useState(null);
   const [missingOptions, setMissingOptions] = useState([]);
   const [dataPost, setDataPost] = useState([]);
-  const [orderData, setOrderData] = useState();
+  const [orderData, setOrderData] = useState('');
   const [DetailsState, setDetailsState] = useState([
     { label: "Prix unitaire", value: null },
     { label: "Prix Totale", value: null },
   ]);
+  useEffect(() => {
+
+      setOrderData(JSON.parse(sessionStorage.getItem("orderData")))
+      const orderData =JSON.parse(sessionStorage.getItem("orderData"))
+    
+      // ضبط الخيارات المحددة مسبقًا
+      const initialSelected = {};
+      const initialDataPost = {};
+      orderData.product.proprieter.forEach(prop => {
+        initialSelected[prop.name_proprieter] = prop.options.name_option;
+        initialDataPost[prop.name_proprieter] = prop.options.id_ProductOption;
+      });
+      setSelectedFormats(initialSelected);
+      setDataPost(initialDataPost)
+      if (!orderData) {
+        // إذا لم يوجد بيانات، ارجع إلى صفحة الكارت
+        router.push("/cart");
+        return;
+      }
+    
+     
+    
+      if (!orderData?.uuid || params.uuid != orderData.uuid) {
+        router.push("/cart");
+      }
+  }, [params.uuid]);
+  
+  
 
 
   // ---------------------------
@@ -30,8 +59,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
       return { ...prev, [proprieterName]: value };
     });
   };
-
-   
+  
  function  getSession() {
   
     const sessionId = Cookies.get("session_id");
@@ -81,24 +109,16 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
       { label: "Prix Totale", value: prixTotal ? `${prixTotal} DH HT` : null },
     ];
   
-    if (product?.proprieter ) {
-      const proprieterDetails = product.proprieter.map((prop) => ({
-        label: prop.name_proprieter,
-        value: "-",
-      }));
-  
-      setDetailsState([ ...proprieterDetails,...baseDetails]);
-      onDetailsProprieterChange([ ...proprieterDetails,...baseDetails]);
-    } else if (pathname.includes(params.uuid||"")) {
-      const order = JSON.parse(orderData);
+   
+      const order = JSON.parse(sessionStorage.getItem("orderData"));
       const proprieterDetails = order.product.proprieter.map((prop) => ({
         label: prop.name_proprieter,
         value: prop.options.name_option,
       }));
   
       setDetailsState([ ...proprieterDetails,...baseDetails]);
-      onDetailsProprieterChange([ ...proprieterDetails,...baseDetails,]);
-    }
+    onDetailsProprieterChange([ ...proprieterDetails,...baseDetails,]);
+    
     
   }, [product]);
 
@@ -176,17 +196,22 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
         payload[`selected_option_${index + 1}`] = dataPost[key];
       });
     
-      
-        // 🆕 Store
-      const  response = await fetch("http://127.0.0.1:8000/api/product", {
-          method: "POST",
+     
+    
+      if (orderData) {
+        // ✏️ Update
+        const id_order = orderData.id_orderProduct;
+    
+        const response = await fetch(`http://127.0.0.1:8000/api/product/${id_order}`, {
+          method: "PUT",
           headers: { 
             "Content-Type": "application/json",
             "X-Session-Id": sessionId,
           },
           body: JSON.stringify(payload),
-        })
+        });
     
+      }
       if (!response.ok) {
         const text = await response.text();
         console.error("Server error:", response.status,text);
@@ -318,7 +343,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
             handleSubmit(e)
           }
         }
-        
+        type="submit"
         
           className="mt-4 w-full hover:bg-[#006294] hover:text-[#C09200] bg-[#C09200] text-[#FFFFFF] py-3 rounded transition-colors"
         >

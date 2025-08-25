@@ -1,18 +1,91 @@
 "use client";
 import Image from 'next/image'
 import NavBar from "./Navbar";
-import { useState} from "react"
-import { Search, Headphones, User, ShoppingCart, Menu, X, ChevronDown } from "lucide-react"
+import { useState,useEffect} from "react"
+import Link from "next/link";
+import Cookies  from "js-cookie" ;
+import { Search, User,LogOut, ShoppingCart, Menu, X, ChevronDown } from "lucide-react"
+import { getToken, removeToken } from "@/lib/auth";
+import { request } from "@/lib/api";
+import { useAuth } from "@/components/AuthProvider";
+
+import { useRouter } from "next/navigation";
 export default function Header({navItems}){
     const [searchQuery, setSearchQuery] = useState('')
     const [cartCount] = useState(4)
     const [isSearchOpen, setIsSearchOpen] = useState(false)
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-   
-  
+    const router = useRouter();
+    const { isLoggedIn, logout } = useAuth();
+
 
    
   
+    const handleLogout = async () => {
+      try {
+        await request("/logout", { method: "POST", auth: true });
+        removeToken();
+        logout();
+        Cookies.remove("session_id");
+        router.push("/");
+      } catch (e) {
+        console.error("Logout error:", e.message);
+      } 
+    }
+
+    function generateSessionId() {
+      return crypto.randomUUID(); // ولا أي مولد UUID
+    }
+    
+    // مدة صلاحية بالميلي ثانية (مثلا 15 دقيقة)
+    const SESSION_TIMEOUT = 20 * 60 * 1000; 
+    
+    function setSession() {
+      const sessionId = Cookies.get("session_id") || generateSessionId();
+      const expiryTime = Date.now() + SESSION_TIMEOUT;
+    
+      Cookies.set("session_id", sessionId, { path: "/" });
+      Cookies.set("session_expiry", expiryTime.toString(), { path: "/" });
+    }
+    
+    // استرجاع session إلا مازال صالح
+ 
+    
+    // كلما المستخدم دار أي حركة (click / scroll / keypress) نجدد الوقت
+  
+    
+    useEffect(() => {
+      setSession();
+  
+      const resetSessionTimer = () => {
+        if (Cookies.get("session_id")) {
+          const expiryTime = Date.now() + SESSION_TIMEOUT;
+          Cookies.set("session_expiry", expiryTime.toString(), { path: "/" });
+        }
+      };
+  
+      ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
+        window.addEventListener(evt, resetSessionTimer)
+      );
+  
+      const intervalId = setInterval(() => {
+        const expiry = parseInt(Cookies.get("session_expiry") || "0");
+        if (Date.now() > expiry) {
+          // انتهت الصلاحية → حذف الكوكيز
+          Cookies.remove("session_id", { path: "/" });
+          Cookies.remove("session_expiry", { path: "/" });
+          console.log("Session expired");
+          clearInterval(intervalId); // يمكن توقف التحقق بعد انتهاء session
+        }
+      }, 1000);
+   
+    return () => {
+      ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
+        window.removeEventListener(evt, resetSessionTimer)
+      );
+      clearInterval(intervalId);
+    };
+   }, []);
     return (
       <>
         <header className="bg-white px-4 py-3 sticky top-0 z-50 font-sans font-bold tracking-tight text-lg text-[#006294]">
@@ -67,18 +140,31 @@ export default function Header({navItems}){
                 </svg>            
                      </button>            
         {/* User Profile Icon */}
+        {!isLoggedIn ? (
         <button className="p-2 text-[#006294] bg-[#f4f9fb] hover:bg-[#e6f0f6] rounded-lg transition-all duration-200">
-          <User className="h-5 w-5" color="#006294" />
+          <Link href="/login" className="relative flex items-center">
+            <User className="h-5 w-5" color="#006294" />
+          </Link>
         </button>
+      ) : (
+        <button
+          onClick={handleLogout}
+          className="p-2 text-[#006294] bg-[#f4f9fb] hover:bg-[#e6f0f6] rounded-lg transition-all duration-200"
+        >
+          <LogOut className="h-5 w-5" />
+        </button>
+      )}
 
         {/* Shopping Cart */}
         <button className="relative p-2 text-[#006294] bg-[#f4f9fb] hover:bg-[#e6f0f6] rounded-lg transition-all duration-200">
-          <ShoppingCart className="h-5 w-5" color="#006294" />
-          {cartCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-[#C09200] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">
-              {cartCount}
-            </span>
-          )}
+        <Link href="/cart" className="relative flex items-center">
+    <ShoppingCart className="h-5 w-5" color="#006294" />
+    {cartCount > 0 && (
+      <span className="absolute -top-1 -right-1 bg-[#C09200] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">
+        {cartCount}
+      </span>
+    )}
+  </Link>
         </button>
       </div>
     </div>
@@ -127,14 +213,18 @@ export default function Header({navItems}){
         <button className="p-2 text-[#006294] bg-[#f4f9fb] hover:bg-[#e6f0f6] rounded-lg transition-all duration-200">
           <User className="h-5 w-5" color="#006294" />
         </button>
-
+       
+    
+  
         <button className="relative p-2 text-[#006294] bg-[#f4f9fb] hover:bg-[#e6f0f6] rounded-lg transition-all duration-200">
+          <Link href="/cart" className="relative flex items-center"> 
           <ShoppingCart className="h-5 w-5" color="#006294" />
           {cartCount > 0 && (
             <span className="absolute -top-1 -right-1 bg-[#C09200] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">
               {cartCount}
             </span>
           )}
+          </Link>
         </button>
       </div>
     </div>
