@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\OrderProduct;
 
-use App\Models\order_product_product_options;
+
 use App\Http\Resources\PanierResource;
 
 use App\Models\Panier;
@@ -18,36 +18,48 @@ class PanierController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function valider(Request $request)
+    public function valider(Request $req)
 {
-    $user = $request->user(); // هذا يعمل فقط مع middleware auth:sanctum
-
+    $user_id =Auth::id(); // هذا يعمل فقط مع middleware auth:sanctum
+    $prix = $req->input('prix');
+    $id_session = $req->header('X-Session-Id');
     $panier = Panier::create([
-        'user_id' => $user->id_user,
+        'user_id' => $user_id,
+        "prix_panier"=>$prix
     ]);
 
-    $orders = OrderProduct::where('session_user', session()->getId())->get();
+    $orders = OrderProduct::where('session_user',$id_session)               
+    ->orWhere('user_id', $user_id)
+    ->get();
+    if ($orders->isEmpty()) {
+        return response()->json(['message' => 'Aucun produit dans le panier'], 400);
+    }else{
 
-    foreach ($orders as $order) {
-        DB::table('panier_order_product')->insert([
-            'panier_id' => $panier->id_panier,
-            'order_product_id' => $order->id_orderProduct,
-        ]);
+        foreach ($orders as $order) {
+            DB::table('panier_order_product')->insert([
+                'panier_id' => $panier->id_panier,
+                'order_product_id' => $order->id_orderProduct,
+                
+            ]);
+        }
+        
+        return response()->json(['message' => 'Panier validé avec succès']);
     }
-
-    return response()->json(['message' => 'Panier validé avec succès']);
 }
 
-    public function index()
-    {
+    // public function index()
+    // {
+    //     $id = session()->getId();
+    //     $orders = OrderProduct::with('productOptions.option.proprieter', 'productOptions.product.images')
+    //         ->where('session_user', $id)
+    //         ->get();
 
-        $orders = OrderProduct::with('productOptions.option.proprieter', 'productOptions.product.images')
-            ->where('session_user', session()->getId())
-            ->get();
 
-
-        return PanierResource::collection($orders);
-    }
+    //     return response()->json([
+    //     'data'=>PanierResource::collection($orders),
+    //     "id"=>$id
+    //     ]);
+    // }
 
     /**
      * Show the form for creating a new resource.
@@ -68,15 +80,64 @@ class PanierController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id_session)
     {
-        $orders = OrderProduct::with('productOptions.option.proprieter', 'productOptions.product.images')
-            ->where('session_user', $id)
-            ->get();
-        if ($orders) {
+        try {
+            if (Auth::check()) {
+                $user_id = Auth::id();
+                $orders = OrderProduct::with([
+                        'productOptions.option.proprieter',
+                        'productOptions.product.images'
+                    ])
+                    ->where('user_id', $user_id)
+                    ->orWhere('session_user', $id_session)
+                    ->get();
+            } else {
+                // إذا المستخدم غير مسجل الدخول نستعمل session_user
+                $orders = OrderProduct::with([
+                        'productOptions.option.proprieter',
+                        'productOptions.product.images'
+                    ])
+                    ->where('session_user', $id_session)
+                    ->get();
+            }
 
-            return PanierResource::collection($orders);
-        }
+
+        return response()->json([
+            "id"=>Auth::id(),
+            'data' => PanierResource::collection($orders)
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    };
+    }
+    public function showNotLogin(string $id_session)
+    {
+        try {
+            
+                // إذا المستخدم غير مسجل الدخول نستعمل session_user
+                $orders = OrderProduct::with([
+                        'productOptions.option.proprieter',
+                        'productOptions.product.images'
+                    ])
+                    ->where('session_user', $id_session)
+                    ->get();
+            
+
+
+        return response()->json([
+            
+            'data' => PanierResource::collection($orders)
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+            'trace' => $e->getTraceAsString(),
+        ], 500);
+    };
     }
 
     /**
@@ -100,6 +161,13 @@ class PanierController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $order = OrderProduct::find($id);
+        if (!$order) {
+            return response()->json(['success' => false, 'message' => 'Order not found'], 404);
+        }
+    
+        $order->delete();
+    
+        return response()->json(['success' => true, 'message' => 'Order deleted successfully']);
     }
 }

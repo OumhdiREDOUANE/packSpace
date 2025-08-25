@@ -7,19 +7,24 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\ProductOption;
 use App\Models\Panier;
 
-
+use Illuminate\Support\Str;
 class OrderProduct extends Model
 {
     /** @use HasFactory<\Database\Factories\OrderProductFactory> */
     use HasFactory;
     protected $primaryKey = 'id_orderProduct';
     
-
-    protected $fillable = ['session_user'];
+    protected static function booted()
+    {
+        static::creating(function ($order) {
+            $order->uuid = (string) Str::uuid();
+        });
+    }
+    protected $fillable = ['session_user',"uuid","user_id"];
     
     public function productOptions()
     {
-        return $this->belongsToMany(ProductOption::class, 'order_product_product_option', 'order_product_id', 'product_option_id');
+        return $this->belongsToMany(ProductOption::class, 'order_product_product_options', 'order_product_id', 'product_option_id');
     }
 
     public function paniers()

@@ -12,8 +12,16 @@ class CreateOrderProductsTable extends Migration
     {
         Schema::create('order_products', function (Blueprint $table) {
             $table->bigIncrements('id_orderProduct');
-             // عمود المفتاح الأجنبي
+             
+            $table->uuid('uuid')->unique();
                   $table->string('session_user');
+                  $table->foreignId('user_id')
+                  ->nullable()
+                  ->references('id_user')
+                  ->on('users')
+                    ->onDelete('cascade');
+                  
+
             $table->timestamps();
         });
     }

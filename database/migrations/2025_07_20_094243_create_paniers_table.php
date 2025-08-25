@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('paniers', function (Blueprint $table) {
             $table->bigIncrements('id_panier');
+
             $table->unsignedBigInteger('user_id');
     $table->foreign('user_id')->references('id_user')->on('users')->onDelete('cascade');
+    $table->decimal("prix_panier",8,2);
             $table->timestamps();
         });
     }

@@ -24,14 +24,25 @@ class LoginController extends Controller
         if (!$user->hasVerifiedEmail()) {
             return response()->json(['message' => 'يجب تفعيل البريد الإلكتروني أولاً'], 403);
         }
-
-        // إنشاء توكن جديد
         $token = $user->createToken('api-token')->plainTextToken;
-
+        // إنشاء توكن جديد
+       
         return response()->json([
             'message' => 'تم تسجيل الدخول بنجاح',
-            'token' => $token,
+            "token"=>$token,
             'user' => $user,
         ]);
+    }
+
+public function logout(Request $request)
+    {
+     
+        Auth::guard('web')->logout();
+
+        // invalidate session
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        $request->session()->regenerate();
+        return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
     }
 }

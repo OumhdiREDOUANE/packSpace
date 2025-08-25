@@ -32,12 +32,14 @@ class PanierResource extends JsonResource
             'options' =>  [
                     'id_option' => $first->option->id_option,
                     'name_option' => $first->option->name_option,
+                    "id_ProductOption"=>$first->id_ProductOption
                 ],
         ];
     })->values(); // important to reset numeric keys
 
     return [
         'id_orderProduct' => $this->id_orderProduct,
+        'uuid'=>$this->uuid,
 
         'prix_total' => $this->productOptions->sum('prix'),
 

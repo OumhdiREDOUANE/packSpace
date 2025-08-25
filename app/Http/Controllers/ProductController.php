@@ -83,7 +83,7 @@ class ProductController extends Controller
 public function store(Request $request)
 {
     $validated = [];
-
+    $sessionId = $request->header('X-Session-Id');
     // تمر على كل مجموعة خيارات حسب propriétaire
     foreach ($request->all() as $key => $value) {
         if (strpos($key, 'selected_option_') === 0) {
@@ -91,7 +91,8 @@ public function store(Request $request)
         }
     }
     $order = OrderProduct::create([
-        'session_user' => session()->getId()
+        'session_user' => $sessionId,
+        'user_id' =>null
     ]);
      foreach ($validated as $productOptionId) {
         $order_product_product_option = OrderProductProductOption::create([
@@ -102,11 +103,47 @@ public function store(Request $request)
 
     return response()->json([
         "success" => true,
+        'session_id' => session()->getId(),
         "order" => $order_product_product_option,
         "options" => $validated
     ], 201);
     
 }
+public function update(Request $request, $id)
+{
+    $sessionId = $request->header('X-Session-Id');
+
+    // نجيب order ديال هاد session والـ id
+    $order = OrderProduct::where('id_orderProduct', $id)
+        ->where('session_user', $sessionId)
+        ->firstOrFail();
+
+    // نمسح جميع الـ options القديمة
+    OrderProductProductOption::where('order_product_id', $order->id_orderProduct)->delete();
+
+    // نفس المنطق ديال validation
+    $validated = [];
+    foreach ($request->all() as $key => $value) {
+        if (strpos($key, 'selected_option_') === 0) {
+            $validated[$key] = $value;
+        }
+    }
+
+    // نضيف الـ options الجدد
+    foreach ($validated as $productOptionId) {
+        OrderProductProductOption::create([
+            'product_option_id' => $productOptionId,
+            'order_product_id' => $order->id_orderProduct
+        ]);
+    }
+
+    return response()->json([
+        "success" => true,
+        "order"   => $order,
+        "options" => $validated
+    ]);
+}
+
 
 //     public function show($id)
 // {

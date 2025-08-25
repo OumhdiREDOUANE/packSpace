@@ -28,6 +28,6 @@ class ProductOption extends Model
 
     public function orderProducts()
     {
-        return $this->belongsToMany(OrderProduct::class, 'order_product_product_option', 'product_option_id', 'order_product_id');
+        return $this->belongsToMany(OrderProduct::class, 'order_product_product_options', 'product_option_id', 'order_product_id');
     }
 }
