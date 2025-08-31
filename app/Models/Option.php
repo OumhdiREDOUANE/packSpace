@@ -13,7 +13,7 @@ class Option extends Model
     protected $primaryKey = 'id_option';
     
 
-    protected $fillable = ['name_option', 'image_option', 'proprieter_id'];
+    protected $fillable = ['name_option', 'image_option',"description_option",'proprieter_id'];
 
     public function proprieter()
     {

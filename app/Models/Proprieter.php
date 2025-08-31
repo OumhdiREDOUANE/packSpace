@@ -12,7 +12,7 @@ class Proprieter extends Model
     protected $primaryKey = 'id_proprieter';
     
 
-    protected $fillable = ['name_proprieter'];
+    protected $fillable = ['name_proprieter',"description_proprieter"];
 
     public function options()
     {

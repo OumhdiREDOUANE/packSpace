@@ -3,19 +3,29 @@
 use App\Http\Controllers\CategoriesAndProducts;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PanierController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\OrderController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\ProductDashboardController;
+use App\Http\Controllers\ProrieterDashboardController;
+use App\Http\Controllers\OptionDashboardController;
 
+
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::apiResource('users',UserController::class);
 Route::apiResource('/categories', CategoriesAndProducts::class);
+Route::apiResource('/categoryDashboard', CategoryController::class);
+
 Route::apiResource('/product', ProductController::class);
+Route::apiResource('/productDashboard', ProductDashboardController::class);
+Route::apiResource('/proprieterDashboard', ProrieterDashboardController::class);
+Route::apiResource('/optionDashboard', OptionDashboardController::class);
+
 Route::post('/product', [ProductController::class,"store"]);
 Route::apiResource('/cart', PanierController::class)->only("show")->middleware('auth:sanctum');
 Route::delete('/cart/notLogin/{id}', [PanierController::class, 'destroy']);

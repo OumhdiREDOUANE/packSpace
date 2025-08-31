@@ -12,7 +12,7 @@ class Categorie extends Model
     protected $primaryKey = 'id_categorie';
     
 
-    protected $fillable = ['name_categorie'];
+    protected $fillable = ['name_categorie',"description_categorie"];
 
     public function products()
     {

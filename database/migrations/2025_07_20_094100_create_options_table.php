@@ -14,6 +14,9 @@ return new class extends Migration
         Schema::create('options', function (Blueprint $table) {
             $table->BigIncrements('id_option');
             $table->string('name_option');
+            $table->string('description_option');
+
+
             $table->string('image_option');
             
             $table->foreignId('proprieter_id')

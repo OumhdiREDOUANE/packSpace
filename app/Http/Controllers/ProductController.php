@@ -19,8 +19,25 @@ class ProductController extends Controller
      */
     public function index()
     {
-        //
+        try {
+            // Récupérer seulement id_product et name_product
+            $products = Product::select('id_product', 'name_product')->get();
+    
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Products fetched successfully',
+                'data' => $products,
+                'total_products' => $products->count(),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch products',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
+    
 
     /**
      * Show the form for creating a new resource.

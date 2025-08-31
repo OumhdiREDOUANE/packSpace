@@ -24,7 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $fillable = ['numero_telephone', 'email', 'nomComplet','password',"remember_token" ];
+    protected $fillable = ['numero_telephone', 'email', 'nomComplet','password',"remember_token" ,"role"];
 
     
     /**
