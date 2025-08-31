@@ -1,0 +1,132 @@
+
+
+"use client";
+
+import { useState ,useRef,useEffect} from "react";
+import { ZoomIn } from 'lucide-react';
+import PhotoSwipe from "photoswipe";
+import "photoswipe/style.css";
+
+import Image from "next/image";
+// const details = [
+//         { label: "Pelliculage", value: "-" },
+//         { label: "Vernis", value: "-" },
+//         { label: "Impression", value: "-" },
+//         { label: "Format", value: "-" },
+//         { label: "Papier", value: "-" },
+//         { label: "Quantité", value: "-" },
+//       ];
+const images = [
+  {
+    thumb: "/FLY_Cat_300x300.jpg",
+    full: "/FLY_Cat_300x300.jpg",
+  },
+  {
+    thumb: "/ETUP_Cat_300x300.jpg",
+    full: "/ETUP_Cat_300x300.jpg",
+  },
+  {
+    thumb: "/CV_Cat_300x300.jpg",
+    full: "/CV_Cat_300x300.jpg",
+  },
+  {
+    thumb: "/DEP_Cat_300x300.jpg",
+    full: "/DEP_Cat_300x300.jpg",
+  },
+];
+
+export default function ProductGallery({ DetailsProprieter }) {
+  const [selectedImage, setSelectedImage] = useState(images[0]);
+
+  const galleryRef = useRef(null);
+  
+  const openGallery = () => {
+    const pswp = new PhotoSwipe({
+      dataSource: images.map((img) => ({
+        src: img.full,
+        width: 566,
+        height: 566
+      })),
+      index: images.findIndex((img) => img.thumb === selectedImage.thumb),
+    });
+
+    pswp.init();
+  };
+  
+   
+  return (<>
+  <div>
+
+  <div className="flex space-y-6 gap-7 h-fit " ref={galleryRef}>
+    <div className="col-6 flex flex-col h-[385px] gap-4 overflow-x-auto pb-2 px-2 border-r border-r-4 border-gray-300 ">
+    {images.map((img, idx) => (
+      <button
+        key={idx}
+        onClick={() => setSelectedImage(img)}
+        className={`w-content   cursor-pointer border-2  overflow-hidden transition ${
+          selectedImage.thumb === img.thumb
+            ? "border-blue-500"
+            : "border-gray-300"
+        }`} 
+      
+        rel="noreferrer"
+      >
+        
+        
+        <img
+          src={img.thumb}
+          alt={`thumb-${idx}`}
+       data-pswp-width="566px"
+          data-pswp-height="566px"
+          width={69}
+          height={69}
+          className="object-cover"
+        />
+        
+      </button>
+    ))}
+  </div>
+  {/* Main Image */}
+  <div className="col-6 text-center">
+  <button onClick={openGallery} className="relative group  cursor-pointer">
+      <img
+        src={selectedImage.thumb}
+        alt="Flyer"
+        width={457}
+        height={625}
+        className="mx-auto object-contain"
+      />
+    <div className="absolute inset-0 flex items-end justify-center opacity-0 group-hover:opacity-40 transition-opacity bg-transparent">
+  <span className="flex items-center gap-2 text-white text-sm font-medium mb-3 px-4 py-1 bg-black bg-opacity-20 rounded-md">
+    <ZoomIn className="w-5 h-5 text-white" />
+    Cliquer pour agrandir
+  </span>
+</div>
+
+    </button>
+  
+  </div>
+ 
+      
+  {/* Carousel */}
+
+</div>
+ <table className="w-full mt-6 mb-3 text-sm ">
+ <tbody>
+   {DetailsProprieter?.map((item, index) => (
+    item.value!=null&&<tr key={index} className="border-b border-gray-200">
+       <td className="font-semibold p-2 w-1/3">{item.label}</td>
+       <td className="p-2  text-center">{item.value}</td>
+     </tr>
+   ))}
+ </tbody>
+</table>
+<button className="mt-4 w-full hover:bg-[#006294] hover:text-[#C09200] bg-[#C09200] text-[#FFFFFF]   py-3 rounded  transition transition-colors">
+      
+      TELECHARGER UN DEVIS
+      </button>
+</div>
+</>
+) 
+}
+     
