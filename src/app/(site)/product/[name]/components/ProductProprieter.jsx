@@ -176,7 +176,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
         payload[`selected_option_${index + 1}`] = dataPost[key];
       });
     
-      
+       payload.prix_orderProduct = prixTotal
         // 🆕 Store
       const  response = await fetch("http://127.0.0.1:8000/api/product", {
           method: "POST",

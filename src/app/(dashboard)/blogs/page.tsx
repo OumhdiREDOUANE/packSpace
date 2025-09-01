@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -10,55 +10,25 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Plus, Search, Edit, Trash2, Eye, Calendar } from "lucide-react"
 import { BlogDialog } from "@/components/blog-dialog"
 import { DeleteBlogDialog } from "@/components/delete-blog-dialog"
-
-const mockBlogs = [
-  {
-    id: "1",
-    title: "Getting Started with PackSpace Dashboard",
-    excerpt: "Learn how to navigate and use the PackSpace dashboard effectively...",
-    author: "John Doe",
-    authorAvatar: "/author-avatar.png",
-    publishDate: "2024-01-15",
-    status: "published",
-    category: "Tutorial",
-    views: 1250,
-  },
-  {
-    id: "2",
-    title: "Best Practices for Product Management",
-    excerpt: "Discover the key strategies for effective product management in e-commerce...",
-    author: "Jane Smith",
-    authorAvatar: "/female-author.png",
-    publishDate: "2024-01-12",
-    status: "published",
-    category: "Guide",
-    views: 890,
-  },
-  {
-    id: "3",
-    title: "Understanding Analytics and Reports",
-    excerpt: "Deep dive into the analytics features and how to interpret your data...",
-    author: "Mike Johnson",
-    authorAvatar: "/male-author.png",
-    publishDate: "2024-01-10",
-    status: "draft",
-    category: "Analytics",
-    views: 0,
-  },
-]
-
+import { BlogViewDialog } from "@/components/blog-view-dialog"
 export default function BlogsPage() {
   const [searchTerm, setSearchTerm] = useState("")
-  const [blogs, setBlogs] = useState(mockBlogs)
+  const [blogs, setBlogs] = useState<any[]>([])
   const [blogDialogOpen, setBlogDialogOpen] = useState(false)
   const [deleteBlogDialogOpen, setDeleteBlogDialogOpen] = useState(false)
-  const [selectedBlog, setSelectedBlog] = useState<(typeof mockBlogs)[0] | null>(null)
+  const [selectedBlog, setSelectedBlog] = useState<any | null>(null)
+const [viewDialogOpen, setViewDialogOpen] = useState(false)
+const [viewBlog, setViewBlog] = useState<any | null>(null)
+  const fetchBlogs = async () => {
+    const res = await fetch("http://127.0.0.1:8000/api/BlogDashboard")
+    const data = await res.json()
+    console.log(data)
+    setBlogs(data)
+  }
 
-  const filteredBlogs = blogs.filter(
-    (blog) =>
-      blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      blog.category.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+  useEffect(() => {
+    fetchBlogs()
+  }, [])
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -76,41 +46,58 @@ export default function BlogsPage() {
     setBlogDialogOpen(true)
   }
 
-  const handleEditBlog = (blog: (typeof mockBlogs)[0]) => {
+  const handleEditBlog = (blog: any) => {
     setSelectedBlog(blog)
     setBlogDialogOpen(true)
   }
 
-  const handleDeleteBlog = (blog: (typeof mockBlogs)[0]) => {
+  const handleDeleteBlog = (blog: any) => {
     setSelectedBlog(blog)
     setDeleteBlogDialogOpen(true)
   }
 
-  const handleSaveBlog = (blogData: any) => {
+  const handleSaveBlog = async (blogData: any) => {
     if (selectedBlog) {
-      setBlogs(blogs.map((blog) => (blog.id === selectedBlog.id ? { ...blog, ...blogData } : blog)))
+      // Update
+      await fetch(`http://127.0.0.1:8000/api/BlogDashboard/${selectedBlog.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(blogData),
+      })
     } else {
-      const newBlog = {
-        id: Date.now().toString(),
-        ...blogData,
-        views: 0,
-        publishDate: new Date().toISOString().split("T")[0],
-      }
-      setBlogs([...blogs, newBlog])
+      // Create
+      await fetch("http://127.0.0.1:8000/api/BlogDashboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(blogData),
+      })
     }
     setBlogDialogOpen(false)
+    fetchBlogs()
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedBlog) {
-      setBlogs(blogs.filter((blog) => blog.id !== selectedBlog.id))
+      await fetch(`http://127.0.0.1:8000/api/BlogDashboard/${selectedBlog.id}`, { method: "DELETE" })
     }
     setDeleteBlogDialogOpen(false)
+    fetchBlogs()
   }
+
+  const filteredBlogs = blogs.filter(
+    (blog) =>
+      blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      blog.category.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+  const handleViewBlog = (blog: any) => {
+  setViewBlog(blog)
+  setViewDialogOpen(true)
+}
+
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+<div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Blog Management</h1>
           <Button onClick={handleAddBlog}>
@@ -175,7 +162,7 @@ export default function BlogsPage() {
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="flex-1 bg-transparent">
+                    <Button variant="outline" size="sm" className="flex-1 bg-transparent"onClick={() => handleViewBlog(blog)}>
                       <Eye className="h-4 w-4 mr-1" />
                       View
                     </Button>
@@ -211,9 +198,8 @@ export default function BlogsPage() {
           </Card>
         )}
       </div>
-
+      <BlogViewDialog open={viewDialogOpen} onOpenChange={setViewDialogOpen} blog={viewBlog} />
       <BlogDialog open={blogDialogOpen} onOpenChange={setBlogDialogOpen} blog={selectedBlog} onSave={handleSaveBlog} />
-
       <DeleteBlogDialog
         open={deleteBlogDialogOpen}
         onOpenChange={setDeleteBlogDialogOpen}

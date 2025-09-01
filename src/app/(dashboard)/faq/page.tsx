@@ -1,8 +1,8 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -11,110 +11,94 @@ import { Plus, Search, Edit, Trash2, ChevronDown, ChevronRight, HelpCircle } fro
 import { FAQDialog } from "@/components/faq-dialog"
 import { DeleteFAQDialog } from "@/components/delete-faq-dialog"
 
-const mockFAQs = [
-  {
-    id: "1",
-    question: "How do I add a new product to my inventory?",
-    answer:
-      "To add a new product, navigate to the Products section and click the 'Add Product' button. Fill in all required fields including name, description, price, and category.",
-    category: "Products",
-    isPublished: true,
-    views: 245,
-  },
-  {
-    id: "2",
-    question: "How can I track my orders?",
-    answer:
-      "You can track all orders in the Orders section. Each order has a status indicator showing whether it's pending, processing, shipped, or delivered.",
-    category: "Orders",
-    isPublished: true,
-    views: 189,
-  },
-  {
-    id: "3",
-    question: "What payment methods are supported?",
-    answer:
-      "We support all major credit cards, PayPal, and bank transfers. You can configure payment methods in the Settings section.",
-    category: "Payments",
-    isPublished: true,
-    views: 156,
-  },
-  {
-    id: "4",
-    question: "How do I manage user permissions?",
-    answer:
-      "User permissions can be managed in the Users section. You can assign different roles such as Admin, Manager, or Viewer to control access levels.",
-    category: "Users",
-    isPublished: false,
-    views: 0,
-  },
-  {
-    id: "5",
-    question: "Can I export my data?",
-    answer:
-      "Yes, you can export data from various sections including products, orders, and user information. Look for the export button in each section.",
-    category: "Data",
-    isPublished: true,
-    views: 98,
-  },
-]
+interface FAQ {
+  id: string
+  question: string
+  answer: string
+  category: string
+  is_published: boolean
+  views: number
+}
 
 export default function FAQPage() {
+  const [faqs, setFaqs] = useState<FAQ[]>([])
   const [searchTerm, setSearchTerm] = useState("")
-  const [faqs, setFaqs] = useState(mockFAQs)
   const [openItems, setOpenItems] = useState<string[]>([])
   const [faqDialogOpen, setFaqDialogOpen] = useState(false)
   const [deleteFaqDialogOpen, setDeleteFaqDialogOpen] = useState(false)
-  const [selectedFaq, setSelectedFaq] = useState<(typeof mockFAQs)[0] | null>(null)
+  const [selectedFaq, setSelectedFaq] = useState<FAQ | null>(null)
+
+ useEffect(() => {
+  const fetchData = async () => {
+    try {
+      const res = await fetch("http://127.0.0.1:8000/api/FaqDashboard")
+      if (!res.ok) throw new Error("Failed to fetch FAQs")
+      const data = await res.json()
+      setFaqs(data)
+      console.log(data)
+    } catch (error) {
+      console.error("Error fetching FAQs:", error)
+    }
+  }
+
+  fetchData()
+}, [])
 
   const filteredFAQs = faqs.filter(
-    (faq) =>
+    faq =>
       faq.question.toLowerCase().includes(searchTerm.toLowerCase()) ||
       faq.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      faq.answer.toLowerCase().includes(searchTerm.toLowerCase()),
+      faq.answer.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
   const toggleItem = (id: string) => {
-    setOpenItems((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
+    setOpenItems(prev => (prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]))
   }
 
-  const categories = [...new Set(faqs.map((faq) => faq.category))]
+  const categories = [...new Set(faqs.map(f => f.category))]
 
   const handleAddFaq = () => {
     setSelectedFaq(null)
     setFaqDialogOpen(true)
   }
 
-  const handleEditFaq = (faq: (typeof mockFAQs)[0]) => {
+  const handleEditFaq = (faq: FAQ) => {
     setSelectedFaq(faq)
     setFaqDialogOpen(true)
   }
 
-  const handleDeleteFaq = (faq: (typeof mockFAQs)[0]) => {
+  const handleDeleteFaq = (faq: FAQ) => {
     setSelectedFaq(faq)
     setDeleteFaqDialogOpen(true)
   }
 
-  const handleSaveFaq = (faqData: any) => {
+  const handleSaveFaq = async (faqData: Partial<FAQ>) => {
     if (selectedFaq) {
-      // Edit existing FAQ
-      setFaqs(faqs.map((f) => (f.id === selectedFaq.id ? { ...f, ...faqData } : f)))
+      const res = await fetch(`http://127.0.0.1:8000/api/FaqDashboard/${selectedFaq.id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(faqData),
+      })
+      const updatedFaq = await res.json()
+      console.log(updatedFaq)
+      setFaqs(faqs.map(f => (f.id === updatedFaq.id ? updatedFaq : f)))
     } else {
-      // Add new FAQ
-      const newFaq = {
-        id: Date.now().toString(),
-        ...faqData,
-        views: 0,
-      }
+      const res = await fetch("http://127.0.0.1:8000/api/FaqDashboard", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(faqData),
+      })
+      const newFaq = await res.json()
       setFaqs([...faqs, newFaq])
     }
     setFaqDialogOpen(false)
     setSelectedFaq(null)
   }
 
-  const handleConfirmDelete = () => {
+  const handleConfirmDelete = async () => {
     if (selectedFaq) {
-      setFaqs(faqs.filter((f) => f.id !== selectedFaq.id))
+      await fetch(`http://127.0.0.1:8000/api/FaqDashboard/${selectedFaq.id}`, { method: "DELETE" })
+      setFaqs(faqs.filter(f => f.id !== selectedFaq.id))
     }
     setDeleteFaqDialogOpen(false)
     setSelectedFaq(null)
@@ -126,43 +110,24 @@ export default function FAQPage() {
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">FAQ Management</h1>
           <Button onClick={handleAddFaq}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add FAQ
+            <Plus className="h-4 w-4 mr-2" /> Add FAQ
           </Button>
         </div>
 
-        {/* Search and Stats */}
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card className="md:col-span-2">
-            <CardContent className="pt-6">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <Input
-                  placeholder="Search FAQs..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{faqs.filter((f) => f.isPublished).length}</div>
-                <div className="text-sm text-muted-foreground">Published FAQs</div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="pt-6">
-              <div className="text-center">
-                <div className="text-2xl font-bold">{faqs.reduce((sum, faq) => sum + faq.views, 0)}</div>
-                <div className="text-sm text-muted-foreground">Total Views</div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Search */}
+        <Card>
+          <CardContent className="pt-6">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
+              <Input
+                placeholder="Search FAQs..."
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+                className="pl-10"
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Categories */}
         <Card>
@@ -172,9 +137,14 @@ export default function FAQPage() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-wrap gap-2">
-              {categories.map((category) => (
-                <Badge key={category} variant="secondary" className="cursor-pointer hover:bg-secondary/80">
-                  {category} ({faqs.filter((faq) => faq.category === category).length})
+              {categories.map(category => (
+                <Badge
+                  key={category}
+                  variant="secondary"
+                  className="cursor-pointer hover:bg-secondary/80"
+                  onClick={() => setSearchTerm(category)}
+                >
+                  {category} ({faqs.filter(f => f.category === category).length})
                 </Badge>
               ))}
             </div>
@@ -183,7 +153,7 @@ export default function FAQPage() {
 
         {/* FAQ List */}
         <div className="space-y-4">
-          {filteredFAQs.map((faq) => (
+          {filteredFAQs.map(faq => (
             <Card key={faq.id}>
               <Collapsible open={openItems.includes(faq.id)} onOpenChange={() => toggleItem(faq.id)}>
                 <CollapsibleTrigger asChild>
@@ -199,33 +169,18 @@ export default function FAQPage() {
                           <CardTitle className="text-left">{faq.question}</CardTitle>
                           <div className="flex items-center gap-2 mt-2">
                             <Badge variant="outline">{faq.category}</Badge>
-                            <Badge variant={faq.isPublished ? "default" : "secondary"}>
-                              {faq.isPublished ? "Published" : "Draft"}
+                            <Badge variant={faq.is_published ? "default" : "secondary"}>
+                              {faq.is_published ? "Published" : "Draft"}
                             </Badge>
                             <span className="text-sm text-muted-foreground">{faq.views} views</span>
                           </div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleEditFaq(faq)
-                          }}
-                        >
+                        <Button variant="outline" size="sm" onClick={e => { e.stopPropagation(); handleEditFaq(faq) }}>
                           <Edit className="h-4 w-4" />
                         </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteFaq(faq)
-                          }}
-                          className="text-red-500 hover:text-red-700"
-                        >
+                        <Button variant="outline" size="sm" className="text-red-500 hover:text-red-700" onClick={e => { e.stopPropagation(); handleDeleteFaq(faq) }}>
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
@@ -233,10 +188,8 @@ export default function FAQPage() {
                   </CardHeader>
                 </CollapsibleTrigger>
                 <CollapsibleContent>
-                  <CardContent className="pt-0">
-                    <div className="pl-8">
-                      <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
-                    </div>
+                  <CardContent className="pt-0 pl-8">
+                    <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                   </CardContent>
                 </CollapsibleContent>
               </Collapsible>
@@ -255,13 +208,7 @@ export default function FAQPage() {
       </div>
 
       <FAQDialog open={faqDialogOpen} onOpenChange={setFaqDialogOpen} faq={selectedFaq} onSave={handleSaveFaq} />
-
-      <DeleteFAQDialog
-        open={deleteFaqDialogOpen}
-        onOpenChange={setDeleteFaqDialogOpen}
-        faq={selectedFaq}
-        onConfirm={handleConfirmDelete}
-      />
+      <DeleteFAQDialog open={deleteFaqDialogOpen} onOpenChange={setDeleteFaqDialogOpen} faq={selectedFaq} onConfirm={handleConfirmDelete} />
     </DashboardLayout>
   )
 }

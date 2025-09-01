@@ -191,7 +191,7 @@ e.preventDefault();
     Object.keys(dataPost).forEach((key, index) => {
       payload[`selected_option_${index + 1}`] = dataPost[key];
     });
-
+      payload.prix_orderProduct = prixTotal
     let response;
     if (orderData) {
       // ✏️ Update

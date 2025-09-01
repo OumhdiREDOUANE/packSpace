@@ -1,7 +1,5 @@
 "use client"
 
-import type React from "react"
-
 import { useState, useEffect } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
@@ -16,7 +14,7 @@ interface FAQ {
   question: string
   answer: string
   category: string
-  isPublished: boolean
+  is_published: boolean
   views: number
 }
 
@@ -27,14 +25,12 @@ interface FAQDialogProps {
   onSave: (faqData: Partial<FAQ>) => void
 }
 
-const categories = ["Products", "Orders", "Payments", "Users", "Data", "General", "Support"]
-
 export function FAQDialog({ open, onOpenChange, faq, onSave }: FAQDialogProps) {
   const [formData, setFormData] = useState({
     question: "",
     answer: "",
     category: "",
-    isPublished: true,
+    is_published: true,
   })
 
   useEffect(() => {
@@ -43,14 +39,14 @@ export function FAQDialog({ open, onOpenChange, faq, onSave }: FAQDialogProps) {
         question: faq.question,
         answer: faq.answer,
         category: faq.category,
-        isPublished: faq.isPublished,
+        is_published: faq.is_published,
       })
     } else {
       setFormData({
         question: "",
         answer: "",
         category: "",
-        isPublished: true,
+        is_published: true,
       })
     }
   }, [faq, open])
@@ -59,6 +55,8 @@ export function FAQDialog({ open, onOpenChange, faq, onSave }: FAQDialogProps) {
     e.preventDefault()
     onSave(formData)
   }
+
+  const categories = ["Products", "Orders", "Payments", "Users", "Data", "General", "Support"]
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -114,8 +112,8 @@ export function FAQDialog({ open, onOpenChange, faq, onSave }: FAQDialogProps) {
           <div className="flex items-center space-x-2">
             <Switch
               id="published"
-              checked={formData.isPublished}
-              onCheckedChange={(checked) => setFormData({ ...formData, isPublished: checked })}
+              checked={formData.is_published}
+              onCheckedChange={(checked) => setFormData({ ...formData, is_published: checked })}
             />
             <Label htmlFor="published">Publish immediately</Label>
           </div>

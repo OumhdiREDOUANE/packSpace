@@ -49,6 +49,7 @@ if (!order) return;
       order.product.proprieter.forEach((item, index) => {
         payload[`selected_option_${index + 1}`] = item.options.id_ProductOption; 
       });
+      payload.prix_orderProduct = order.prix_total
      console.log(payload)
       const sessionId = Cookies.get("session_id");
       const response = await fetch("http://127.0.0.1:8000/api/product", {

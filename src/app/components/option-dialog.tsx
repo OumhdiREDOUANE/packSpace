@@ -1,180 +1,177 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, X, ImageIcon } from "lucide-react"
+import { Clock, Package, Truck, CheckCircle, XCircle, User, Mail, MapPin } from "lucide-react"
 
-interface Option {
-  id_option: string
+interface OptionItem {
+  id_option: number
   name_option: string
-  image_option: string
-  proprieter_id: string
+  prix: number
 }
 
-interface Proprietor {
-  id_proprieter: string
+interface ProprieterItem {
+  id_proprieter: number
   name_proprieter: string
+  options: OptionItem
 }
 
-interface OptionDialogProps {
+interface OrderItem {
+  id: number
+  name: string
+  price: number
+  quantity: number
+  image: string
+}
+
+interface Order {
+  id: number
+  uuid: string
+  customerName: string
+  customerEmail: string
+  items: OrderItem[]
+  total: number
+  status: "Registered" | "Validated"
+  orderDate: string
+  shippingAddress?: string
+  productImage: string
+  proprieter: ProprieterItem[]
+}
+
+interface OrderDetailsDialogProps {
+  order: Order | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  option?: Option | null
-  proprietors: Proprietor[]
-  onSave: (optionData: Partial<Option>) => void
+  onUpdateStatus: (orderId: number, status: Order["status"]) => void
 }
 
-export function OptionDialog({ open, onOpenChange, option, proprietors, onSave }: OptionDialogProps) {
-  const [formData, setFormData] = useState({
-    name_option: "",
-    image_option: "",
-    proprieter_id: "",
-  })
-  const [imagePreview, setImagePreview] = useState<string>("")
+export function OrderDetailsDialog({ order, open, onOpenChange, onUpdateStatus }: OrderDetailsDialogProps) {
+  if (!order) return null
 
-  useEffect(() => {
-    if (option) {
-      setFormData({
-        name_option: option.name_option,
-        image_option: option.image_option,
-        proprieter_id: option.proprieter_id,
-      })
-      setImagePreview(option.image_option)
-    } else {
-      setFormData({
-        name_option: "",
-        image_option: "",
-        proprieter_id: "",
-      })
-      setImagePreview("")
-    }
-  }, [option, open])
-
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setImagePreview(result)
-        setFormData({ ...formData, image_option: result })
-      }
-      reader.readAsDataURL(file)
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Registered":
+        return "bg-blue-100 text-blue-800"
+      case "Validated":
+        return "bg-green-100 text-green-800"
+      default:
+        return "bg-gray-100 text-gray-800"
     }
   }
 
-  const handleRemoveImage = () => {
-    setImagePreview("")
-    setFormData({ ...formData, image_option: "" })
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case "Registered":
+        return <Clock className="h-4 w-4" />
+      case "Validated":
+        return <CheckCircle className="h-4 w-4" />
+      default:
+        return null
+    }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    onSave(formData)
-  }
+  const subtotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-[700px] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{option ? "Edit Option" : "Add New Option"}</DialogTitle>
+          <DialogTitle className="flex items-center justify-between">
+            <span>Order Details - {order.uuid}</span>
+            <Badge className={getStatusColor(order.status)}>
+              {getStatusIcon(order.status)}
+              <span className="ml-1 capitalize">{order.status}</span>
+            </Badge>
+          </DialogTitle>
+          <DialogDescription>Order placed on {order.orderDate}</DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-6 mt-4">
+          {/* Customer Info */}
           <div className="space-y-2">
-            <Label htmlFor="name_option">Option Name</Label>
-            <Input
-              id="name_option"
-              value={formData.name_option}
-              onChange={(e) => setFormData({ ...formData, name_option: e.target.value })}
-              placeholder="Enter option name..."
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label>Option Image</Label>
-            {imagePreview && (
-              <div className="relative w-full h-32 border-2 border-dashed border-gray-300 rounded-lg overflow-hidden">
-                <img
-                  src={imagePreview || "/placeholder.svg"}
-                  alt="Option preview"
-                  className="w-full h-full object-cover"
-                />
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  className="absolute top-2 right-2"
-                  onClick={handleRemoveImage}
-                >
-                  <X className="h-4 w-4" />
-                </Button>
+            <h3 className="text-lg font-semibold">Customer Information</h3>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center gap-2">
+                <User className="h-4 w-4 text-muted-foreground" />
+                <span>{order.customerName}</span>
               </div>
-            )}
-            {!imagePreview && (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                <ImageIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <div className="space-y-2">
-                  <Label htmlFor="image-upload" className="cursor-pointer">
-                    <Button type="button" variant="outline" className="mb-2 bg-transparent">
-                      <Upload className="h-4 w-4 mr-2" />
-                      Upload Image
-                    </Button>
-                  </Label>
-                  <Input
-                    id="image-upload"
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                  <p className="text-sm text-gray-500">or</p>
-                  <Input
-                    placeholder="Enter image URL..."
-                    value={formData.image_option}
-                    onChange={(e) => {
-                      setFormData({ ...formData, image_option: e.target.value })
-                      setImagePreview(e.target.value)
-                    }}
-                  />
+              <div className="flex items-center gap-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                <span>{order.customerEmail}</span>
+              </div>
+              {order.shippingAddress && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-muted-foreground" />
+                  <span>{order.shippingAddress}</span>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
+          <Separator />
+
+          {/* Products & Options */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">Products & Options</h3>
+            <div className="flex flex-col gap-4">
+              {order.items.map((item) => (
+                <div key={item.id} className="border rounded-lg p-3">
+                  <div className="flex items-center gap-4">
+                    <img src={item.image || "/placeholder.svg"} alt={item.name} className="h-16 w-16 object-cover rounded-md" />
+                    <div>
+                      <h4 className="font-medium">{item.name}</h4>
+                      <p className="text-sm text-muted-foreground">Quantity: {item.quantity}</p>
+                    </div>
+                  </div>
+                  {/* Proprieter & Options */}
+                  <div className="mt-2 grid grid-cols-2 gap-2">
+                    {order.proprieter.map((p) => (
+                      <div key={p.id_proprieter} className="flex flex-col border p-2 rounded-md">
+                        <span className="font-medium">{p.name_proprieter}</span>
+                        <span className="text-sm">{p.options.name_option}</span>
+                        <span className="text-sm font-semibold">${p.options.prix}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Order Summary */}
           <div className="space-y-2">
-            <Label htmlFor="proprieter_id">Proprietor</Label>
-            <Select
-              value={formData.proprieter_id}
-              onValueChange={(value) => setFormData({ ...formData, proprieter_id: value })}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select proprietor" />
+            <h3 className="text-lg font-semibold">Order Summary</h3>
+            <div className="flex justify-between">
+              <span>Subtotal:</span>
+              <span>${subtotal.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Total:</span>
+              <span>${order.total.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <Separator />
+
+          {/* Update Status */}
+          <div className="flex items-center gap-4">
+            <Select value={order.status} onValueChange={(value: Order["status"]) => onUpdateStatus(order.id, value)}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {proprietors.map((proprietor) => (
-                  <SelectItem key={proprietor.id_proprieter} value={proprietor.id_proprieter}>
-                    {proprietor.name_proprieter}
-                  </SelectItem>
-                ))}
+                <SelectItem value="Registered">Registered</SelectItem>
+                <SelectItem value="Validated">Validated</SelectItem>
               </SelectContent>
             </Select>
+            <Button onClick={() => onOpenChange(false)}>Close</Button>
           </div>
-
-          <div className="flex justify-end space-x-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
-              Cancel
-            </Button>
-            <Button type="submit">{option ? "Update Option" : "Create Option"}</Button>
-          </div>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   )

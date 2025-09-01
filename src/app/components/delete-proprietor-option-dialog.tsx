@@ -6,8 +6,8 @@ import { AlertTriangle, Sliders } from "lucide-react"
 
 interface ProprietorOption {
   id: string
-  name: string
-  description: string
+  name_option: string
+  description_option: string
   type: string
   value: string
   category: string
