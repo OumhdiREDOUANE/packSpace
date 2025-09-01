@@ -10,22 +10,28 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductDashboardController;
 use App\Http\Controllers\ProrieterDashboardController;
 use App\Http\Controllers\OptionDashboardController;
+use App\Http\Controllers\CartDashboardController;
 
-
+use App\Http\Controllers\OrderDashboardController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\FaqDashboardController;
+use App\Http\Controllers\BlogDashboardController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::apiResource('users',UserController::class);
 Route::apiResource('/categories', CategoriesAndProducts::class);
 Route::apiResource('/categoryDashboard', CategoryController::class);
-
+Route::apiResource('/OrderDashboard', OrderDashboardController::class);
 Route::apiResource('/product', ProductController::class);
 Route::apiResource('/productDashboard', ProductDashboardController::class);
 Route::apiResource('/proprieterDashboard', ProrieterDashboardController::class);
 Route::apiResource('/optionDashboard', OptionDashboardController::class);
-
+Route::apiResource('/CartDashboard', CartDashboardController::class);
+Route::apiResource('FaqDashboard', FaqDashboardController::class);
+Route::apiResource('BlogDashboard', BlogDashboardController::class);
 Route::post('/product', [ProductController::class,"store"]);
 Route::apiResource('/cart', PanierController::class)->only("show")->middleware('auth:sanctum');
 Route::delete('/cart/notLogin/{id}', [PanierController::class, 'destroy']);

@@ -41,6 +41,9 @@ class PanierController extends Controller
                 'order_product_id' => $order->id_orderProduct,
                 
             ]);
+            $order->update([
+            'status' =>"Validated",
+        ]);
         }
         
         return response()->json(['message' => 'Panier validé avec succès']);

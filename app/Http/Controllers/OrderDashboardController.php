@@ -3,17 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Resources\OrderDashboardResource;
+
 use App\Models\OrderProduct;
-use Illuminate\Support\Facades\Auth;
-class OrderController extends Controller
+class OrderDashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        //
-    }
+
+public function index(Request $request)
+{
+  
+
+    $orders = OrderProduct::with(['user', 'productOptions.option.proprieter', 'productOptions.product.images'])
+    ->whereIn('status', ['Registered', 'Validated'])
+    ->get();
+
+return OrderDashboardResource::collection($orders);
+   
+}
 
     /**
      * Show the form for creating a new resource.
@@ -52,18 +61,7 @@ class OrderController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $userId = Auth::id();
-    $sessionId = $request->header('X-Session-Id');
-    OrderProduct::where('id_orderProduct', $id)->update([
-        'session_user' => $sessionId,
-        'user_id' => $userId,
-        'status' => "Registered",
-      
-    ]);
-    return response()->json([
-        'message' => 'Order saved',
-        
-    ]);
+        //
     }
 
     /**

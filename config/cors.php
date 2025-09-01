@@ -29,7 +29,7 @@ return [
     | Allowed headers
     |--------------------------------------------------------------------------
     */
-    'allowed_headers' => ['Content-Type', 'X-Requested-With', 'Authorization',"X-Session-Id"],
+    'allowed_headers' => ["*"],
 
     /*
     |--------------------------------------------------------------------------

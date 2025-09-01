@@ -20,7 +20,7 @@ class OrderProduct extends Model
             $order->uuid = (string) Str::uuid();
         });
     }
-    protected $fillable = ['session_user',"uuid","user_id"];
+    protected $fillable = ['session_user',"uuid","user_id","status","prix_orderProduct"];
     
     public function productOptions()
     {
@@ -34,6 +34,6 @@ class OrderProduct extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+       return $this->belongsTo(User::class, 'user_id', 'id_user');
     }
     }

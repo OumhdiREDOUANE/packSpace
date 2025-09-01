@@ -16,6 +16,9 @@ return new class extends Migration
 
             $table->unsignedBigInteger('user_id');
     $table->foreign('user_id')->references('id_user')->on('users')->onDelete('cascade');
+    $table->enum('status', ['Pending', 'Completed', 'Delivered', 'Cancelled'])
+    ->default('Pending');
+    
     $table->decimal("prix_panier",8,2);
             $table->timestamps();
         });

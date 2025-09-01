@@ -109,7 +109,8 @@ public function store(Request $request)
     }
     $order = OrderProduct::create([
         'session_user' => $sessionId,
-        'user_id' =>null
+        'user_id' =>null,
+        'prix_orderProduct'=>$request->prix_orderProduct
     ]);
      foreach ($validated as $productOptionId) {
         $order_product_product_option = OrderProductProductOption::create([
@@ -134,7 +135,8 @@ public function update(Request $request, $id)
     $order = OrderProduct::where('id_orderProduct', $id)
         ->where('session_user', $sessionId)
         ->firstOrFail();
-
+OrderProduct::where('id_orderProduct', $id)
+    ->update(['prix_orderProduct' =>$request->prix_orderProduct ]);
     // نمسح جميع الـ options القديمة
     OrderProductProductOption::where('order_product_id', $order->id_orderProduct)->delete();
 

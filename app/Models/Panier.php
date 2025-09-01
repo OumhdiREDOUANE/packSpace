@@ -14,7 +14,7 @@ class Panier extends Model
     protected $primaryKey = 'id_panier';
 
 
-    protected $fillable = ['user_id','prix_panier'];
+    protected $fillable = ['user_id','prix_panier',"status"];
 
     public function orderProducts()
     {

@@ -20,8 +20,9 @@ class CreateOrderProductsTable extends Migration
                   ->references('id_user')
                   ->on('users')
                     ->onDelete('cascade');
-                  
-
+            $table->enum('status', ['Not Registered', 'Registered', 'Validated'])
+                  ->default('Not Registered');
+            $table->decimal('prix_orderProduct', 10, 2);
             $table->timestamps();
         });
     }
