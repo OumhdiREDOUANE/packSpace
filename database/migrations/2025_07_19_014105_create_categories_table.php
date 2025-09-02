@@ -15,6 +15,7 @@ return new class extends Migration
             $table->BigIncrements('id_categorie');
             $table->string("description_categorie");
             $table->string("name_categorie");
+            $table->string("url");
             $table->timestamps();
         });
     }

@@ -18,5 +18,10 @@ class Categorie extends Model
     {
         return $this->hasMany(Product::class, 'categorie_id');
     }
+    public function groups()
+{
+    return $this->hasMany(Group::class, 'categorie_id', 'id_categorie');
+}
+
     
 }

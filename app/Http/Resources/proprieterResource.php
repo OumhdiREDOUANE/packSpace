@@ -19,6 +19,7 @@ class proprieterResource extends JsonResource
         return [
            'id_proprieter' => $this->resource['proprieter']->id_proprieter,
             'name_proprieter' => $this->resource['proprieter']->name_proprieter,
+            'description_proprieter' => $this->resource['proprieter']->description_proprieter,
            'options' => OptionResource::collection($this->resource['options']),
         ];
     }

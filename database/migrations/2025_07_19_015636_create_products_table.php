@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string("description_product");
             
             $table->foreignId('categorie_id')->constrained("categories","id_categorie")->onDelete('cascade');
-            
+            $table->unsignedBigInteger('group_id')->nullable();
+    $table->foreign('group_id')->references('id_group')->on('groups')->onDelete('cascade');
             $table->timestamps();
         });
     }

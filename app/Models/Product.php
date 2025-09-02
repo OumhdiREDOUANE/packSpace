@@ -29,4 +29,8 @@ class Product extends Model
 {
     return $this->hasMany(ImageProduct::class,'product_id', 'id_product');
 }
+public function group()
+{
+    return $this->belongsTo(Group::class, 'group_id', 'id_group');
+}
 }

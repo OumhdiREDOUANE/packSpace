@@ -6,7 +6,7 @@ use App\Models\Product;
 use App\Models\Categorie;
 use App\Http\Resources\proprieterResource;
 use App\Http\Resources\ImageProductResource;
-
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\OrderProduct;
 
@@ -17,28 +17,66 @@ class ProductController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        try {
-            // Récupérer seulement id_product et name_product
-            $products = Product::select('id_product', 'name_product')->get();
-    
-            return response()->json([
-                'status' => 'success',
-                'message' => 'Products fetched successfully',
-                'data' => $products,
-                'total_products' => $products->count(),
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Failed to fetch products',
-                'error' => $e->getMessage(),
-            ], 500);
-        }
-    }
-    
+   public function index(Request $request)
+{
+    try {
+        $query = Product::select('id_product', 'name_product');
 
+        // فلترة حسب search query إذا وجد
+        if ($request->has('search') && !empty($request->search)) {
+            $search = $request->search;
+            $query->where('name_product', 'like', "%{$search}%");
+        }
+
+        $products = $query->get();
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Products fetched successfully',
+            'data' => $products,
+            'total_products' => $products->count(),
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => 'Failed to fetch products',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
+public function topProducts()
+{
+    // نجلب المنتجات مع أعلى سعر لكل منتج بناءً على الطلبات
+    $topProducts = Product::with('images')
+        ->select('id_product', 'name_product', 'description_product')
+        ->withMax('productOptions as max_price', 'prix') // أعلى سعر لكل منتج من productOptions المرتبطة بالطلب
+        ->with(['images' => function($q) {
+            $q->limit(1); // صورة واحدة فقط لكل منتج
+        }])
+        ->withCount(['productOptions as total_orders' => function($query){
+            $query->select(DB::raw('count(*)'));
+        }])
+        ->orderByDesc('total_orders')
+        ->limit(8)
+        ->get();
+
+    // ترتيب النتائج حسب أعلى سعر للطلب
+    $result = $topProducts->map(function($product){
+        return [
+            'id_product' => $product->id_product,
+            'name_product' => $product->name_product,
+            'description_product' => $product->description_product?? null,
+            'max_prix' => $product->max_price,
+            'image' => $product->images->first() ? new ImageProductResource($product->images->first()) : null,
+        ];
+    });
+
+    return response()->json([
+        'status' => 'success',
+        'data' => $result
+    ]);
+}
     /**
      * Show the form for creating a new resource.
      */
