@@ -5,7 +5,46 @@ import { Facebook, Instagram, Linkedin } from "lucide-react"
 export default function Footer() {
   return (
     <footer className="bg-[#F4F9FB] border-t border-primaryBlue mt-auto font-helveticaBoldCondensed">
-
+<section
+    id="newsletter"
+    className="bg-[#FFFFFF] border-t border-[#006294] py-12 font-helveticaCondensed"
+  >
+    <div className="container mx-auto px-4 flex flex-col md:flex-row items-center">
+      <div className="md:w-1/3 mb-6 md:mb-0 flex justify-center md:justify-start">
+        <img src="/boite.png" alt="Newsletter" width={200} height={200} />
+      </div>
+      <div className="md:w-2/3 text-right">
+        <h2 className="text-2xl text-[#006294] font-semibold mb-2">
+          Inscrivez-vous à notre Newsletter.
+        </h2>
+        <p className="text-[#58595a] mb-4 font-medium">
+          et recevez toutes les nouveautés, inspirations, promotions...
+        </p>
+  
+        <form
+          
+          className="flex flex-col md:flex-row gap-4 items-center"
+        >
+          <input
+            type="email"
+            placeholder="Saisissez votre email ici"
+            required
+            value=""
+            
+            className="flex-1 px-4 py-2 border border-[#006294] rounded-md focus:outline-none focus:ring-2 focus:ring-[#C09200] transition"
+          />
+          <button
+            type="submit"
+            className="bg-[#C09200] text-[#FFFFFF] px-6 py-2 rounded-md font-semibold hover:bg-[#006294] hover:text-[#C09200] transition-colors duration-300"
+          >
+            ENVOYER
+          </button>
+        </form>
+  
+    
+      </div>
+    </div>
+  </section>
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Desktop Layout */}
       <div className="hidden md:grid md:grid-cols-12 gap-8">

@@ -28,23 +28,48 @@ export default function ProductPage({ product }) {
 
   return (
     <>
-      <div className="flex my-7 gap-[30px]">
-        {/* الجزء الثاني (القصير) ثابت */}
-        <div
-          ref={galleryRef}
-          className={`w-full md:w-6/12 h-fit ${
-            scrollPassed ? "relative" : "sticky top-0"
-          }`}
-          style={{ alignSelf: "start" }}
-        >
-          <ProductGallery DetailsProprieter={DetailsProprieter} />
-        </div>
+     <div className="flex flex-col md:flex-row my-7 gap-6 md:gap-[30px]">
+      {/* Gallery Section */}
+      <div
+        ref={galleryRef}
+        className={`w-full md:w-6/12 ${
+          scrollPassed ? "relative" : "md:sticky md:top-0"
+        }`}
+        style={{ alignSelf: "start" }}
+      >
+        <ProductGallery DetailsProprieter={DetailsProprieter} />
+      </div>
 
-        {/* الجزء الطويل (FlyerFormat) */}
-        <div ref={flyerRef} className="w-full h-fit md:w-6/12">
-          <FlyerFormat product={product} onDetailsProprieterChange={(details) => setDetailsProprieter(details)} />
+      {/* Flyer Format Section */}
+      <div ref={flyerRef} className="w-full md:w-6/12">
+        <FlyerFormat
+          product={product}
+          onDetailsProprieterChange={(details) =>
+            setDetailsProprieter(details)
+          }
+        />
+
+        {/* Table → يظهر فقط في الموبايل */}
+        <div className="block md:hidden mt-6">
+          <table className="w-full mb-3 text-sm">
+            <tbody>
+              {DetailsProprieter?.map(
+                (item, index) =>
+                  item.value != null && (
+                    <tr key={index} className="border-b border-gray-200">
+                      <td className="font-semibold p-2 w-1/3">{item.label}</td>
+                      <td className="p-2 text-center">{item.value}</td>
+                    </tr>
+                  )
+              )}
+            </tbody>
+          </table>
+          <button className="mt-4 w-full hover:bg-[#006294] hover:text-[#C09200] bg-[#C09200] text-white py-3 rounded transition-colors">
+            TELECHARGER UN DEVIS
+          </button>
         </div>
       </div>
+    </div>
     </>
   );
 }

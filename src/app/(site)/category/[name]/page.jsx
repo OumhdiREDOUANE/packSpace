@@ -1,5 +1,5 @@
 // app/category/page.tsx (أو أي ملف jsx/tsx حسب المسار)
-
+import Link from 'next/link';
 async function fetchProductsByCategory(name) {
     const res = await fetch(`http://127.0.0.1:8000/api/categories/${name}`, {
      next: { revalidate: 60 } // لإلغاء التخزين المؤقت أثناء التطوير، احذف أو غيّر حسب الحاجة
@@ -31,6 +31,8 @@ export default async function CategoryPage({params}) {
        src="/slide2.jpg"
        alt="Banner"
        className="w-full h-auto object-cover "
+       placeholder="blur"
+                  blurDataURL="/placeholder.jpg"
      />
    </div>
       <h6 className="text-[#006294] text-2xl text-center font-semibold my-[36px] tracking-wide">{name=='h%C3%B4tellerie-restauration'?"Hôtellerie / Restauration":name}</h6>
@@ -46,22 +48,24 @@ export default async function CategoryPage({params}) {
                 src={prod.image_product[0].url_image}
                 alt={prod.name_product}
               className="w-full h-[225px] object-cover"
+              placeholder="blur"
+                  blurDataURL="/placeholder.jpg"
               />
                    <h3 className="text-center text-[#333] font-semibold text-lg py-6 px-2">
-                   <a  
-                   href={`/product/${prod.id_product}`}   
+                   <Link
+                   href={`/product/${encodeURIComponent(prod.name_product)}`}
                    className="hover:text-[#C09200] transition-colors duration-200"
              >
-                </a>
+                </Link>
                 {prod.name_product}
                            </h3>
                            <div className="flex-1 flex flex-col justify-end px-4 pb-4">
-            <a
-              href={`/product/${prod.id_product}`}
+            <Link
+                href={`/product/${encodeURIComponent(prod.name_product)}`}
               className="bg-[#006294] hover:bg-[#C09200] text-white text-center py-2 rounded-md font-semibold transition-colors duration-300"
             >
               Commander
-            </a>
+            </Link>
           </div>
           </div>
        </div>

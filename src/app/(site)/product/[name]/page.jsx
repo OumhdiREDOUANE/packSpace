@@ -24,6 +24,7 @@ export default async function ProductPage({ params }) {
   }
 
   const product = await res.json();
+  console.log(product)
 
   return <ProductSection product={product} />;
 }

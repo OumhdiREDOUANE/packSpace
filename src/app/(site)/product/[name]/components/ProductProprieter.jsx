@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import Cookies  from "js-cookie" ;
 const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
   const router = useRouter();
@@ -213,8 +213,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
         {product.name_product}
       </h1>
       <p className="text-justify text-sm text-gray-700 mb-8">
-        Des flyers personnalisés pour diffuser vos messages avec impact. Formats
-        variés, impression rapide et professionnelle.
+        {product.description_product}
       </p>
 
       {/* Options */}
@@ -228,11 +227,24 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
             <h4 className="text-lg font-semibold pr-3">
               {proprieter.name_proprieter}
             </h4>
-            <img
-              src="/interrogation.png"
-              alt="?"
-              className="w-5 h-5 cursor-pointer"
-            />
+           <Popover>
+        <PopoverTrigger asChild>
+          <img
+            src="/interrogation.png"
+            alt="?"
+            className="w-5 h-5 cursor-pointer hover:opacity-80 transition"
+          />
+        </PopoverTrigger>
+        <PopoverContent
+          side="top"
+          align="center"
+          className="w-64 p-3 rounded-xl shadow-md bg-white border text-sm"
+        >
+          <h5 className="font-semibold text-gray-800 mb-2">À propos</h5>
+          <p className="text-gray-600 leading-relaxed">{proprieter.description_proprieter}
+          </p>
+        </PopoverContent>
+      </Popover>
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
@@ -275,7 +287,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
                     alt={option.name_option}
                     className="w-24 mb-2"
                   />
-                  <span className="text-sm font-medium text-center">
+                  <span className="text-sm text-center">
                     {option.name_option}
                   </span>
                 </label>
