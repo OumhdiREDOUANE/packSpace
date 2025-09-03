@@ -3,6 +3,7 @@
 use App\Http\Controllers\CategoriesAndProducts;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PanierController;
+use App\Http\Controllers\FaqController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
@@ -17,7 +18,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\FaqDashboardController;
 use App\Http\Controllers\BlogDashboardController;
-
+use App\Http\Controllers\BlogController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,20 +28,21 @@ Route::apiResource('/categoryDashboard', CategoryController::class);
 Route::apiResource('/OrderDashboard', OrderDashboardController::class);
 Route::get('/product/topProducts',[ProductController::class,'topProducts']);
 Route::apiResource('/product', ProductController::class);
-
+Route::apiResource('/blogs', BlogController::class);
 Route::apiResource('/productDashboard', ProductDashboardController::class);
 Route::apiResource('/proprieterDashboard', ProrieterDashboardController::class);
 Route::apiResource('/optionDashboard', OptionDashboardController::class);
-Route::apiResource('/CartDashboard', CartDashboardController::class);
+Route::apiResource('/CartDashboard', CartDashboardController::class)->middleware('auth:sanctum');
 Route::apiResource('FaqDashboard', FaqDashboardController::class);
 Route::apiResource('BlogDashboard', BlogDashboardController::class);
 Route::post('/product', [ProductController::class,"store"]);
 Route::apiResource('/cart', PanierController::class)->only("show")->middleware('auth:sanctum');
 Route::delete('/cart/notLogin/{id}', [PanierController::class, 'destroy']);
-
+Route::apiResource('/faqs', FaqController::class);
 Route::get('/cart/notLogin/{id}', [PanierController::class, 'showNotLogin']);
 Route::post('/cart/valider-panier', [PanierController::class, 'valider'])->middleware('auth:sanctum');
-
+// Route::get('/count', [PanierController::class, 'CountCart'])->middleware('auth:sanctum');
+// Route::get('/count/notLogin', [PanierController::class, 'CountCartNotLogin']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/register', [RegisterController::class, 'register']);
 

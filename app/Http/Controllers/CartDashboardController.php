@@ -4,60 +4,68 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Panier;
+use Illuminate\Support\Facades\Auth;
 
 class CartDashboardController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        // جلب كل الـ paniers مع orders و productOptions
+   public function index()
+{
+    $user = Auth::user();
+
+    if ($user->role === 'admin') {
+        // إذا كان admin، جلب كل الـ paniers
         $paniers = Panier::with([
-            'user', // جلب بيانات المستخدم صاحب الـ panier
-            'orderProducts.productOptions.product.images' // جلب المنتجات والصور
+            'user',
+            'orderProducts.productOptions.product.images'
         ])->get();
+    } else {
+        // إذا لم يكن admin، جلب فقط panier الخاص بالمستخدم
+        $paniers = Panier::with([
+            'user',
+            'orderProducts.productOptions.product.images'
+        ])->where('user_id', $user->id_user)->get();
+    }
 
-        // تحويل البيانات لتنسيق API
-        $result = $paniers->map(function ($panier) {
-            // جلب كل الـ orders في هذا panier
-            $orders = $panier->orderProducts->map(function ($order) {
-                $firstOption = $order->productOptions->first();
-                $product = $firstOption?->product;
-                $image = $product?->images->first();
-
-                return [
-                    'order_id' => $order->id_orderProduct,
-                    'prix_orderProduct' => $order->prix_orderProduct,
-                    'product' => $product ? [
-                        'id_product' => $product->id_product,
-                        'name_product' => $product->name_product,
-                        'image' => $image?->url ?? null, // حسب اسم العمود في جدول الصور
-                        
-                    ] : null
-                ];
-            });
-
-            
-            
+    $result = $paniers->map(function ($panier) {
+        $orders = $panier->orderProducts->map(function ($order) {
+            $firstOption = $order->productOptions->first();
+            $product = $firstOption?->product;
+            $image = $product?->images->first();
 
             return [
-                'panier_id' => $panier->id_panier,
-                'user' => [
-                    'id_user' => $panier->user?->id_user ?? null,
-                    'name' => $panier->user?->nomComplet ?? null,
-                    'numero_telephone' => $panier->user?->numero_telephone  ?? null,
-                    'email' => $panier->user?->email ?? null,
-                ],
-                'orders' => $orders,
-                'status' => $panier->status,
-                'total_prix' => $panier->prix_panier,
-                'created_at'=>$panier->created_at
+                'order_id' => $order->id_orderProduct,
+                'prix_orderProduct' => $order->prix_orderProduct,
+                'product' => $product ? [
+                    'id_product' => $product->id_product,
+                    'name_product' => $product->name_product,
+                    'image' => $image?->url ?? null,
+                ] : null
             ];
         });
 
-        return response()->json($result);
-    }
+        return [
+            'panier_id' => $panier->id_panier,
+            'role' =>  Auth::user()->role ?? null,
+            'user' => [
+                'id_user' => $panier->user?->id_user ?? null,
+                
+                'name' => $panier->user?->nomComplet ?? null,
+                'numero_telephone' => $panier->user?->numero_telephone ?? null,
+                'email' => $panier->user?->email ?? null,
+            ],
+            'orders' => $orders,
+            'status' => $panier->status,
+            'total_prix' => $panier->prix_panier,
+            'created_at' => $panier->created_at
+        ];
+    });
+
+    return response()->json($result);
+}
+
     /**
      * Show the form for creating a new resource.
      */

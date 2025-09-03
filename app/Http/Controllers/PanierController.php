@@ -28,8 +28,11 @@ class PanierController extends Controller
         "prix_panier"=>$prix
     ]);
 
-    $orders = OrderProduct::where('session_user',$id_session)               
-    ->orWhere('user_id', $user_id)
+    $orders = OrderProduct::where(function($query) use ($id_session, $user_id) {
+    $query->where('session_user', $id_session)
+          ->orWhere('user_id', $user_id);
+})
+->where('status', '!=', 'Validated')
     ->get();
     if ($orders->isEmpty()) {
         return response()->json(['message' => 'Aucun produit dans le panier'], 400);
@@ -83,6 +86,9 @@ class PanierController extends Controller
     /**
      * Display the specified resource.
      */
+   
+   
+
     public function show(string $id_session)
     {
         try {
@@ -92,8 +98,11 @@ class PanierController extends Controller
                         'productOptions.option.proprieter',
                         'productOptions.product.images'
                     ])
-                    ->where('user_id', $user_id)
-                    ->orWhere('session_user', $id_session)
+                    ->where(function($query) use ($user_id, $id_session) {
+                $query->where('user_id', $user_id)
+                      ->orWhere('session_user', $id_session);
+            })
+            ->where('status', '!=', 'Validated')
                     ->get();
             } else {
                 // إذا المستخدم غير مسجل الدخول نستعمل session_user
@@ -102,12 +111,14 @@ class PanierController extends Controller
                         'productOptions.product.images'
                     ])
                     ->where('session_user', $id_session)
+                    ->where('status', '!=', 'Validated')
                     ->get();
             }
-
+            
 
         return response()->json([
             "id"=>Auth::id(),
+            
             'data' => PanierResource::collection($orders)
         ]);
     } catch (\Exception $e) {
@@ -132,7 +143,7 @@ class PanierController extends Controller
 
 
         return response()->json([
-            
+           
             'data' => PanierResource::collection($orders)
         ]);
     } catch (\Exception $e) {
@@ -142,6 +153,29 @@ class PanierController extends Controller
         ], 500);
     };
     }
+public function CountCart(Request $request)
+{
+    
+        $id_session = $request->query('session_user');
+        $count = OrderProduct::where('user_id', Auth::id())
+        
+                    ->orWhere('session_user', $id_session)->count();
+   
+
+    return response()->json([
+        "countOfOrder" => $count
+    ]);
+}
+public function CountCartNotLogin(Request $request){
+     
+        $id_session = $request->query('session_user'); // أو من الكوكيز
+        $count = OrderProduct::where('session_user', $id_session)->count();
+    
+
+    return response()->json([
+        "countOfOrder" => $count
+    ]);
+}
 
     /**
      * Show the form for editing the specified resource.

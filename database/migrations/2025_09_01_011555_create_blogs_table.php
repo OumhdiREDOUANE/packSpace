@@ -11,13 +11,14 @@ return new class extends Migration {
         Schema::create('blogs', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+             $table->string('image_blog');
             $table->string('excerpt');
             $table->text('content');
             $table->string('author');
             $table->string('author_avatar')->nullable();
             $table->string('category');
             $table->enum('status', ['draft', 'published'])->default('draft');
-            $table->unsignedBigInteger('views')->default(0);
+     
             $table->timestamps();
         });
     }
