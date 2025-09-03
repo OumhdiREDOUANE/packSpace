@@ -33,6 +33,8 @@ export default function CartClient({ sessionId, orders, token }) {
   useEffect(() => {
     if (data) {
       setDataOfOrders(data);
+     
+      
       setLoading(false);
     }
   }, [data]);
@@ -128,7 +130,15 @@ if (!order) return;
       setLoadingItems(prev => ({ ...prev, [id_orderProduct]: false })); // stop loading
     }
   };
-
+const handleSuivre =  () => {
+    if (!isLoggedIn) {
+      alert("Veuillez vous connecter pour suivre son achat");
+      router.push("/login");
+      return;
+    }else{
+         router.push("/mes_achat");
+    }
+  }
   const handleValidation = async (prix_panier) => {
     if (!isLoggedIn) {
       alert("Veuillez vous connecter pour valider le panier");
@@ -244,7 +254,7 @@ if (!order) return;
           </div>
           <div className="mt-4 flex flex-col gap-3">
             <button onClick={() => handleValidation(dataOfOrders.data.reduce((sum, o) => sum + o.prix_total, 0))} className="w-full bg-[#006294] hover:bg-[#C09200] text-white py-2 rounded-lg font-semibold">Valider mon panier</button>
-            <button onClick={() => (window.location.href = "https://weprint.ma")} className="w-full border py-2 rounded-lg bg-[#006294] hover:bg-[#C09200] text-white">Poursuivre mes achats</button>
+            <button onClick={() =>handleSuivre()} className="w-full border py-2 rounded-lg bg-[#006294] hover:bg-[#C09200] text-white">Poursuivre mes achats</button>
             <button className="w-full bg-[#006294] hover:bg-[#C09200] text-white py-2 rounded-lg font-semibold">Télécharger un devis</button>
           </div>
         </div>

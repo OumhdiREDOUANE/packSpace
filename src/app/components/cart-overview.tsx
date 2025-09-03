@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge"
 import { CartDetailsDialog } from "@/components/cart-details-dialog"
 import { Search, Eye, ShoppingCart, Clock, Users, Trash2 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-
+import Cookies from "js-cookie";
 interface OrderItem {
   order_id: number
   prix_orderProduct:string
@@ -23,6 +23,7 @@ interface OrderItem {
 
 interface Panier {
   panier_id: number
+  role:string
   user: {
     id_user: number | null
     name: string | null
@@ -45,10 +46,20 @@ export function CartOverview() {
   useEffect(() => {
     const fetchCarts = async () => {
       try {
-        const res = await fetch("http://127.0.0.1:8000/api/CartDashboard")
-        const data = await res.json()
-        console.log(data)
-        setCarts(data)
+        const token = Cookies.get("token") || "";
+
+        const res = await fetch("http://127.0.0.1:8000/api/CartDashboard", {
+          headers: token
+            ? { "Authorization": `Bearer ${token}` }
+            : {},
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        const data = await res.json();
+        console.log(data);
+        setCarts(data);
       } catch (error) {
         console.error("Error fetching carts:", error)
       }
@@ -199,7 +210,8 @@ export function CartOverview() {
                         </Button>
 
                         {/* تغيير الحالة */}
-                        <Select
+                        {
+                          cart.role=="admin" &&(<Select
                           value={cart.status}
                           onValueChange={(val) => handleChangeStatus(cart.panier_id, val as Panier["status"])}
                         >
@@ -213,6 +225,9 @@ export function CartOverview() {
                             <SelectItem value="Cancelled">Cancelled</SelectItem>
                           </SelectContent>
                         </Select>
+                          )
+                        }
+                       
 
                         
                       </div>

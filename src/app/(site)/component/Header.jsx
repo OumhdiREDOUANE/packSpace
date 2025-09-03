@@ -13,7 +13,8 @@ import { useAuth } from "src/app/components/AuthProvider";
 export default function Header({ navItems }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [cartCount] = useState(4);
+
+const [cartCount,setCartCount] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -29,6 +30,7 @@ export default function Header({ navItems }) {
     await request("/logout", { method: "POST", auth: true });
     // removeToken();  <-- supprime cette ligne
     Cookies.remove("session_id"); // supprime ton token ou session
+
     logout();
     router.push("/");
   } catch (e) {
@@ -55,8 +57,9 @@ export default function Header({ navItems }) {
     
     // كلما المستخدم دار أي حركة (click / scroll / keypress) نجدد الوقت
   
-    
-    useEffect(() => {
+
+
+  useEffect(() => {
       setSession();
   
       const resetSessionTimer = () => {

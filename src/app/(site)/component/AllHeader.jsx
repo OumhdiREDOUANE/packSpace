@@ -5,11 +5,10 @@ export default async function AllHeader(){
   next: { revalidate: 60 }
 });
 const response = await res.json();
-
 const navItems = response.data.map((category) => {
   // نبني dropdown فارغ
   let dropdown = [];
-
+  
   // نضيف المجموعات مع منتجاتها
   category.groups.forEach((group) => {
     dropdown.push({
@@ -37,6 +36,10 @@ const navItems = response.data.map((category) => {
     dropdown,
   };
 });
+
+    
+ 
+
 
 return(
     <>
