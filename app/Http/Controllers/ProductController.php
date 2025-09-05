@@ -9,7 +9,7 @@ use App\Http\Resources\ImageProductResource;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\OrderProduct;
-
+use App\Models\ImageProduct;
 use App\Models\OrderProductProductOption;
 
 class ProductController extends Controller
@@ -44,7 +44,16 @@ class ProductController extends Controller
         ], 500);
     }
 }
+public function getByProduct($product_id)
+    {
+        $images = ImageProduct::where('product_id', $product_id)->get();
 
+        if ($images->isEmpty()) {
+            return response()->json(['message' => 'No images found'], 404);
+        }
+
+        return response()->json($images);
+    }
 public function topProducts()
 {
     // نجلب المنتجات مع أعلى سعر لكل منتج بناءً على الطلبات

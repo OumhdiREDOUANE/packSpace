@@ -12,6 +12,8 @@ use App\Http\Controllers\ProductDashboardController;
 use App\Http\Controllers\ProrieterDashboardController;
 use App\Http\Controllers\OptionDashboardController;
 use App\Http\Controllers\CartDashboardController;
+use App\Http\Controllers\SettingController;
+
 
 use App\Http\Controllers\OrderDashboardController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
@@ -31,6 +33,7 @@ Route::apiResource('/product', ProductController::class);
 Route::apiResource('/blogs', BlogController::class);
 Route::apiResource('/productDashboard', ProductDashboardController::class);
 Route::apiResource('/proprieterDashboard', ProrieterDashboardController::class);
+Route::apiResource('/setting', SettingController::class);
 Route::apiResource('/optionDashboard', OptionDashboardController::class);
 Route::apiResource('/CartDashboard', CartDashboardController::class)->middleware('auth:sanctum');
 Route::apiResource('FaqDashboard', FaqDashboardController::class);
@@ -41,15 +44,30 @@ Route::delete('/cart/notLogin/{id}', [PanierController::class, 'destroy']);
 Route::apiResource('/faqs', FaqController::class);
 Route::get('/cart/notLogin/{id}', [PanierController::class, 'showNotLogin']);
 Route::post('/cart/valider-panier', [PanierController::class, 'valider'])->middleware('auth:sanctum');
-// Route::get('/count', [PanierController::class, 'CountCart'])->middleware('auth:sanctum');
-// Route::get('/count/notLogin', [PanierController::class, 'CountCartNotLogin']);
+Route::get('/count', [PanierController::class, 'CountCart'])->middleware('auth:sanctum');
+Route::get('/count/notLogin', [PanierController::class, 'CountCartNotLogin']);
 Route::post('/login', [LoginController::class, 'login']);
 Route::post('/register', [RegisterController::class, 'register']);
-
+Route::get('/images/product/{id}', [ProductController::class, 'getByProduct']);
 Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth:sanctum');
 // Route لتأكيد البريد الإلكتروني
 Route::apiResource('/save', OrderController::class)->middleware('auth:sanctum');
+Route::middleware('auth:sanctum')->get('/check-admin', function (Request $request) {
+    // التحقق من دور المستخدم
+    if ($request->user()->role !== 'admin') {
+        return response()->json(['message' => 'Unauthorized'], 403);
+    }
 
+    return response()->json(['message' => 'OK']);
+});
+Route::middleware('auth:sanctum')->get('/navbarDashboard', function (Request $request) {
+    return response()->json([
+      
+        'name' => $request->user()->nomComplet,
+        'email' => $request->user()->email,
+        
+    ]);
+});
 // Route لإعادة إرسال رابط التحقق
 // Route::post('/email/verification-notification', function (Request $request) {
 //     if ($request->user()->hasVerifiedEmail()) {

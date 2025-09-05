@@ -25,12 +25,14 @@ class UserController extends Controller
             'numero_telephone' => 'required|string|max:20|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:6',
+            
             'role' => 'in:admin,user',
             'remember_token' => Str::random(60),
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
         $validated['remember_token'] = Str::random(60);
+         $validated['email_verified_at'] = now();
         $user = User::create($validated);
 
         return response()->json([
@@ -53,6 +55,7 @@ class UserController extends Controller
             'nomComplet' => 'sometimes|string|max:255',
             'numero_telephone' => 'sometimes|string|max:20|unique:users,numero_telephone,' . $user->id_user . ',id_user',
             'email' => 'sometimes|email|unique:users,email,' . $user->id_user . ',id_user',
+            
             'password' => 'sometimes|string|min:6',
             'role' => 'in:admin,user',
         ]);

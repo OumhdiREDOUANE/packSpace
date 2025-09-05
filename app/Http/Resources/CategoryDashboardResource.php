@@ -12,6 +12,7 @@ class CategoryDashboardResource extends JsonResource
             'id_categorie' => $this->id_categorie,
             'name_categorie' => $this->name_categorie,
             'description_categorie' => $this->description_categorie,
+            'url' => $this->url,
            'products_count'=> $this->products_count, // جاي من withCount()
         
         ];

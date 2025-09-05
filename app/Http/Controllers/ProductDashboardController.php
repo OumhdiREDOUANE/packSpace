@@ -1,6 +1,7 @@
 <?php
 // app/Http/Controllers/ProductController.php
 namespace App\Http\Controllers;
+use Cloudinary\Cloudinary;
 
 use App\Models\Product;
 use App\Models\ImageProduct;
@@ -22,20 +23,34 @@ class ProductDashboardController extends Controller
             'name_product' => 'required|string|max:255',
             'description_product' => 'required|nullable|string',
             'categorie_id' => 'required|exists:categories,id_categorie',
-            'images' => 'required|nullable|array',
+            'images.*' => 'image|mimes:jpg,jpeg,png|max:2048'
+            
             
         ]);
+        
 
         $product = Product::create($data);
 
-        if (!empty($data['images'])) {
-            foreach ($data['images'] as $url) {
-                ImageProduct::create([
-                    'product_id'=> $product->id_product,
-                    'url' => $url
-                ]);
-            }
+       if ($request->hasFile('images')) {
+        $cloudinary = new Cloudinary([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key'    => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+            'url' => ['secure' => true],
+        ]);
+
+        foreach ($request->file('images') as $image) {
+            $uploadedFileUrl = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
+
+            ImageProduct::create([
+                'product_id' => $product->id_product,
+                'url' => $uploadedFileUrl,
+            ]);
         }
+    }
+
     }
 
     public function show(Product $product)
@@ -51,23 +66,35 @@ class ProductDashboardController extends Controller
             'name_product' => 'required|string|max:255',
             'description_product' => 'required|nullable|string',
             'categorie_id' => 'required|exists:categories,id_categorie',
-            'images' => 'required|nullable|array',
+            'images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
         $product->update($data);
-        if (isset($data['images'])) {
-            // حذف الصور القديمة
-            $product->images()->delete();
+         $existingImages = $request->input('existing_images', []);
     
-            // إضافة الصور الجديدة
-            foreach ($data['images'] as $url) {
-                ImageProduct::create([
-                    'product_id' => $product->id_product,
-                    'url' => $url
-                ]);
-            }
+    // حذف الصور القديمة التي لم يتم الاحتفاظ بها
+    $product->images()->whereNotIn('url', $existingImages)->delete();
+       if ($request->hasFile('images')) {
+        
+        $cloudinary = new Cloudinary([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key'    => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+            'url' => ['secure' => true],
+        ]);
+
+        foreach ($request->file('images') as $image) {
+            $uploadedFileUrl = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
+
+            ImageProduct::create([
+                'product_id' => $product->id_product,
+                'url' => $uploadedFileUrl,
+            ]);
         }
-    
+    }
+
 
         return new ProductsOfCategorieDashboardResource($product->load(['categorie','images']));
     }

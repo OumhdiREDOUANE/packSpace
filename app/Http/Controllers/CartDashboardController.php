@@ -16,7 +16,7 @@ class CartDashboardController extends Controller
     $user = Auth::user();
 
     if ($user->role === 'admin') {
-        // إذا كان admin، جلب كل الـ paniers
+        
         $paniers = Panier::with([
             'user',
             'orderProducts.productOptions.product.images'

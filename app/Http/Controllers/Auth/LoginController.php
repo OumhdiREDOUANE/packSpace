@@ -37,12 +37,10 @@ class LoginController extends Controller
 public function logout(Request $request)
     {
      
-        Auth::guard('web')->logout();
+     $request->user()->currentAccessToken()->delete();
 
         // invalidate session
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-        $request->session()->regenerate();
+  
         return response()->json(['message' => 'تم تسجيل الخروج بنجاح']);
     }
 }

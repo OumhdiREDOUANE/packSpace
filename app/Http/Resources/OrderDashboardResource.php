@@ -46,7 +46,7 @@ class OrderDashboardResource extends JsonResource
             // معلومات user
             'user' => $this->user ? [
                 'id_user' => $this->user->id_user,
-                'name'    => $this->user->nameComplet,
+                'name'    => $this->user->nomComplet,
                 'email'   => $this->user->email,
                  'numero_telephone'   => $this->user->numero_telephone,
             ] : null,

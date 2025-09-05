@@ -6,7 +6,7 @@ use App\Models\Option;
 use App\Models\Proprieter;
 use App\Models\ProductOption;
 use Illuminate\Http\Request;
-
+use Cloudinary\Cloudinary;
 class OptionDashboardController extends Controller
 {
     /**
@@ -73,19 +73,32 @@ class OptionDashboardController extends Controller
     $request->validate([
         'name_option' => 'required|string|max:255',
         'description_option' => 'required|string',
-        'image_option' => 'required|string', // أو file إذا سترفع صورة
+        'image' => 'image|mimes:jpg,jpeg,png|max:2048', // أو file إذا سترفع صورة
         'proprieter_id' => 'required|exists:proprieters,id_proprieter',
         'product_id' => 'required|exists:products,id_product',
         'prix' => 'required|numeric',
     ]);
-
+if ($request->hasFile('image')) {
+            $cloudinary = new Cloudinary([
+                'cloud' => [
+                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                    'api_key'    => env('CLOUDINARY_API_KEY'),
+                    'api_secret' => env('CLOUDINARY_API_SECRET'),
+                ],
+                'url' => ['secure' => true],
+            ]);
+            $image=$request->file('image');
+            
+            $uploadedFileUrl = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
+            
     // 2️⃣ Create new Option
     $option = \App\Models\Option::create([
         'name_option' => $request->name_option,
         'description_option' => $request->description_option ,
-        'image_option' => $request->image_option ,
+        'image_option' => $uploadedFileUrl,
         'proprieter_id' => $request->proprieter_id,
     ]);
+
 
     // 3️⃣ If product_id is provided, create ProductOption relation
     if ($request->filled('product_id')) {
@@ -95,7 +108,7 @@ class OptionDashboardController extends Controller
             'prix' => $request->prix ?? null,
         ]);
     }
-
+}
     // 4️⃣ Return the created option as JSON
     return response()->json([
         'success' => true,
@@ -128,25 +141,41 @@ class OptionDashboardController extends Controller
     $request->validate([
         'name_option' => 'required|string|max:255',
         'description_option' => 'required|string',
-        'image_option' => 'required|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         'proprieter_id' => 'nullable|exists:proprieters,id_proprieter',
         'product_id' => 'nullable|exists:products,id_product',
         'prix' => 'nullable|numeric',
     ]);
-
-    // ✅ جلب option
-    $option = \App\Models\Option::findOrFail($id);
+       $option = \App\Models\Option::findOrFail($id);
 
     // ✅ تحديث الحقول الأساسية
     $option->name_option = $request->name_option;
     $option->description_option = $request->description_option;
-    $option->image_option = $request->image_option;
-
-    // ✅ تحديث proprieter_id فقط إذا كان مملوء
     if ($request->filled('proprieter_id')) {
         $option->proprieter_id = $request->proprieter_id;
     }
+    // ✅ جلب option
+   if ($request->hasFile('image')) {
 
+    // ✅ تحديث proprieter_id فقط إذا كان مملوء
+    
+  
+        $cloudinary = new Cloudinary([
+            'cloud' => [
+                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
+                'api_key'    => env('CLOUDINARY_API_KEY'),
+                'api_secret' => env('CLOUDINARY_API_SECRET'),
+            ],
+            'url' => ['secure' => true],
+        ]);
+
+        $image = $request->file('image'); // ملف واحد
+        $uploadedFileUrl = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
+        
+    
+    $option->image_option =$uploadedFileUrl;
+    
+    }
     $option->save();
 
     // ✅ تحديث ProductOption
@@ -164,14 +193,15 @@ class OptionDashboardController extends Controller
             $productOption->update($data);
         }
     } else {
-        if ($request->filled('product_id') && $request->filled('prix')) {
+        if ($request->filled('product_id') ) {
             \App\Models\ProductOption::create([
                 'option_id' => $option->id_option,
                 'product_id' => $request->product_id,
                 'prix' => $request->prix,
             ]);
         }
-    }
+    
+}
 
     return response()->json([
         'success' => true,

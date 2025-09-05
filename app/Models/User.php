@@ -8,6 +8,8 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Laravel\Sanctum\HasApiTokens;
+
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
@@ -24,7 +26,7 @@ class User extends Authenticatable implements MustVerifyEmail
     public $incrementing = true;
     protected $keyType = 'int';
 
-    protected $fillable = ['numero_telephone', 'email', 'nomComplet','password',"remember_token" ,"role"];
+    protected $fillable = ['numero_telephone', 'email', 'nomComplet','password',"remember_token" ,"role","email_verified_at"];
 
     
     /**
@@ -58,4 +60,5 @@ public function orderProducts()
 {
     return $this->hasMany(OrderProduct::class, 'user_id');
 }
+
 }
