@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect , useRef} from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -27,7 +27,7 @@ interface Product {
   description_product: string
   categorie_id: number
   categorie?: string
-  images: { url_image: string }[]
+  images: { id_image: number; url_image: string }[]
 }
 
 interface ProductDialogProps {
@@ -42,10 +42,12 @@ export function ProductDialog({ product, open, onOpenChange, onSave }: ProductDi
     name_product: "",
     description_product: "",
     categorie_id: "",
-    images: [] as string[],
+    newImages: [] as File[],        // الصور الجديدة فقط
+  existingImages: [] as string[]
   })
 
   const [categories, setCategories] = useState<Category[]>([])
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
   // جلب لائحة الكاتيجوري من API
   useEffect(() => {
@@ -60,31 +62,41 @@ export function ProductDialog({ product, open, onOpenChange, onSave }: ProductDi
         name_product: product.name_product,
         description_product: product.description_product,
         categorie_id: product.categorie_id.toString(),
-        images: product.images.map((img) => img.url_image),
+        newImages: [],
+      existingImages: product.images.map(img => img.url_image),
+        
       })
     } else {
       setFormData({
         name_product: "",
         description_product: "",
         categorie_id: "",
-        images: ["/placeholder.svg"],
+        newImages: [],
+      existingImages: [],
       })
     }
+    if (fileInputRef.current) fileInputRef.current.value = ""
   }, [product, open])
 
-  const addImage = () => setFormData({ ...formData, images: [...formData.images, ""] })
+  
+const handleAddImage = (files: FileList | null) => {
+  if (!files) return
+  const newFiles = Array.from(files)
+  setFormData({ ...formData, newImages: [...formData.newImages, ...newFiles] })
+  if (fileInputRef.current) fileInputRef.current.value = ""
+}
+const removeNewImage = (index: number) => {
+  const updated = [...formData.newImages]
+  updated.splice(index, 1)
+  setFormData({ ...formData, newImages: updated })
+}
 
-  const removeImage = (index: number) => {
-    const newImages = formData.images.filter((_, i) => i !== index)
-    setFormData({ ...formData, images: newImages })
-  }
-
-  const updateImage = (index: number, value: string) => {
-    const newImages = [...formData.images]
-    newImages[index] = value
-    setFormData({ ...formData, images: newImages })
-  }
-
+// حذف صورة قديمة
+const removeExistingImage = (index: number) => {
+  const updated = [...formData.existingImages]
+  updated.splice(index, 1)
+  setFormData({ ...formData, existingImages: updated })
+}
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     onSave(formData)
@@ -101,6 +113,7 @@ export function ProductDialog({ product, open, onOpenChange, onSave }: ProductDi
         </DialogHeader>
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            {/* Product Name */}
             <div className="grid gap-2">
               <Label htmlFor="name_product">Product Name</Label>
               <Input
@@ -112,6 +125,7 @@ export function ProductDialog({ product, open, onOpenChange, onSave }: ProductDi
               />
             </div>
 
+            {/* Description */}
             <div className="grid gap-2">
               <Label htmlFor="description_product">Description</Label>
               <Textarea
@@ -124,6 +138,7 @@ export function ProductDialog({ product, open, onOpenChange, onSave }: ProductDi
               />
             </div>
 
+            {/* Category */}
             <div className="grid gap-2">
               <Label htmlFor="categorie_id">Category</Label>
               <Select
@@ -143,46 +158,51 @@ export function ProductDialog({ product, open, onOpenChange, onSave }: ProductDi
               </Select>
             </div>
 
+            {/* Images */}
             <div className="grid gap-2">
               <div className="flex items-center justify-between">
                 <Label>Product Images</Label>
-                <Button type="button" variant="outline" size="sm" onClick={addImage}>
-                  <Plus className="h-4 w-4" />
-                  Add Image
+                <Button type="button" variant="outline" size="sm">
+                  <label className="flex items-center gap-1 cursor-pointer">
+                    <Plus className="h-4 w-4" />
+                    Add Image
+                    <input
+                ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      className="hidden"
+                      onChange={(e) => handleAddImage(e.target.files)}
+                    />
+                  </label>
                 </Button>
               </div>
-              <div className="space-y-3">
-                {formData.images.map((image, index) => (
-                  <div key={index} className="flex items-start gap-3 p-3 border rounded-lg">
-                    <Input
-                      value={image}
-                      onChange={(e) => updateImage(index, e.target.value)}
-                      placeholder="Enter image URL"
-                      required
-                    />
-                    {image && (
-                      <img
-                        src={image}
-                        alt={`Product image ${index + 1}`}
-                        className="h-16 w-16 rounded-md object-cover border"
-                      />
-                    )}
-                    {formData.images.length > 1 && (
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => removeImage(index)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                  </div>
-                ))}
+              <div className="flex flex-wrap gap-3 mt-2">
+                
+  {formData.existingImages.map((url, index) => (
+    <div key={`existing-${index}`} className="relative">
+      <img src={url} alt={`preview ${index}`} className="h-16 w-16 rounded object-cover border" />
+      <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-5 w-5 p-0"
+        onClick={() => removeExistingImage(index)}>
+        <X className="h-3 w-3" />
+      </Button>
+    </div>
+  ))}
+
+  {formData.newImages.map((file, index) => (
+    <div key={`new-${index}`} className="relative">
+      <img src={URL.createObjectURL(file)} alt={`preview ${index}`} className="h-16 w-16 rounded object-cover border" />
+      <Button type="button" variant="destructive" size="icon" className="absolute -top-2 -right-2 h-5 w-5 p-0"
+        onClick={() => removeNewImage(index)}>
+        <X className="h-3 w-3" />
+      </Button>
+    </div>
+  ))}
+
               </div>
             </div>
           </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel

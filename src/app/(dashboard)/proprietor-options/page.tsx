@@ -42,11 +42,12 @@ export default function ProprietorOptionsPage() {
 
   const [filterProprietor, setFilterProprietor] = useState("all")
   const [filterProduct, setFilterProduct] = useState("all")
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
 
   // Fetch options from Laravel API
   const fetchOptions = async () => {
     try {
-      let url = `http://127.0.0.1:8000/api/optionDashboard?proprieter_id=${filterProprietor}&product_id=${filterProduct}`
+      let url = `${API_URL}/optionDashboard?proprieter_id=${filterProprietor}&product_id=${filterProduct}`
       const res = await fetch(url)
       const data = await res.json()
       setOptions(data)
@@ -58,7 +59,7 @@ export default function ProprietorOptionsPage() {
   // Fetch proprietors and products for dropdowns
   const fetchFiltersData = async () => {
     try {
-      const res = await fetch("http://127.0.0.1:8000/api/proprieterDashboard")
+      const res = await fetch(`${API_URL}/proprieterDashboard`)
     const data = await res.json()
     console.log(data)
     setProprietors(data.proprieters)
@@ -98,20 +99,18 @@ export default function ProprietorOptionsPage() {
   }
 
   const handleSaveOption = async (optionData: any) => {
-    try {
-      if (selectedOption) {
-        await fetch(`http://127.0.0.1:8000/api/optionDashboard/${selectedOption.id_option}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(optionData),
-        })
-      } else {
-        await fetch("http://127.0.0.1:8000/api/optionDashboard", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(optionData),
-        })
-      }
+        if (selectedOption) optionData.append("_method", "PUT");
+   try {
+    const url = selectedOption
+      ? `${API_URL}/optionDashboard/${selectedOption.id_option}`
+      : `${API_URL}/optionDashboard`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      body: optionData,
+    });
+
+      if (!res.ok) throw new Error("Failed to save option")
       fetchOptions()
       setOptionDialogOpen(false)
       setSelectedOption(null)
@@ -123,7 +122,7 @@ export default function ProprietorOptionsPage() {
   const handleConfirmDelete = async () => {
     if (!selectedOption) return
     try {
-      await fetch(`http://127.0.0.1:8000/api/optionDashboard/${selectedOption.id_option}`, { method: "DELETE" })
+      await fetch(`${API_URL}/optionDashboard/${selectedOption.id_option}`, { method: "DELETE" })
       fetchOptions()
       setDeleteOptionDialogOpen(false)
       setSelectedOption(null)

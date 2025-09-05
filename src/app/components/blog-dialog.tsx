@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect,useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -16,11 +16,11 @@ interface Blog {
   excerpt: string
   content: string
   author: string
-  authorAvatar: string
+  image_blog:string
   publishDate: string
   status: string
   category: string
-  views: number
+
 }
 
 interface BlogDialogProps {
@@ -31,12 +31,14 @@ interface BlogDialogProps {
 }
 
 export function BlogDialog({ open, onOpenChange, blog, onSave }: BlogDialogProps) {
+    const [previewImage, setPreviewImage] = useState<string | null>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null)
   const [formData, setFormData] = useState({
     title: "",
     excerpt: "",
     content: "",
     author: "",
-    authorAvatar: "",
+  image: null as File | null,
     category: "",
     status: "draft",
   })
@@ -48,26 +50,50 @@ export function BlogDialog({ open, onOpenChange, blog, onSave }: BlogDialogProps
         excerpt: blog.excerpt,
         content: blog.content || "",
         author: blog.author,
-        authorAvatar: blog.authorAvatar,
+       image: null,
         category: blog.category,
         status: blog.status,
       })
+      setPreviewImage(blog.image_blog || null)
     } else {
       setFormData({
         title: "",
         excerpt: "",
         content: "",
         author: "",
-        authorAvatar: "",
+        image: null,
         category: "",
         status: "draft",
       })
+      if (fileInputRef.current) fileInputRef.current.value = ""
     }
+
   }, [blog, open])
+const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setFormData({ ...formData, image: file })
+
+      // عرض preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(formData)
+    const data = new FormData()
+    data.append("title", formData.title)
+    data.append("excerpt", formData.excerpt)
+        data.append("content", formData.content)
+    data.append("author", formData.author)
+       data.append("category", formData.category)
+    data.append("status", formData.status)
+    if (formData.image) data.append("image", formData.image)
+    onSave(data)
   }
 
   return (
@@ -146,15 +172,6 @@ export function BlogDialog({ open, onOpenChange, blog, onSave }: BlogDialogProps
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="authorAvatar">Author Avatar URL</Label>
-              <Input
-                id="authorAvatar"
-                value={formData.authorAvatar}
-                onChange={(e) => setFormData({ ...formData, authorAvatar: e.target.value })}
-                placeholder="Enter author avatar URL..."
-              />
-            </div>
           </div>
 
           <div className="space-y-2">
@@ -169,6 +186,23 @@ export function BlogDialog({ open, onOpenChange, blog, onSave }: BlogDialogProps
               </SelectContent>
             </Select>
           </div>
+          <div className="grid gap-2">
+                        <Label>Upload Image</Label>
+                        <Input
+                          type="file"
+                          accept="image/*"
+                          ref={fileInputRef}
+                          onChange={handleImageChange}
+                        />
+                      </div>
+                      {previewImage && (
+                        <div className="grid gap-2">
+                          
+                          <div className="relative w-20 h-20">
+                            <img src={previewImage} alt="preview" className="w-20 h-20 rounded object-cover border" />
+                          </div>
+                        </div>
+                      )}
 
           <div className="flex justify-end space-x-2">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

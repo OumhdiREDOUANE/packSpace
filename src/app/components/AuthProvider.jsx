@@ -2,7 +2,7 @@
 "use client";
 import { createContext, useContext, useState, useEffect } from "react";
 import { getToken, removeToken } from "../lib/auth";
-
+import Cookies from "js-cookie";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
@@ -33,7 +33,7 @@ function generateSessionId() {
   const logout = () => {
     removeToken();
     setIsLoggedIn(false);
-     
+     setSession()
 
   };
 

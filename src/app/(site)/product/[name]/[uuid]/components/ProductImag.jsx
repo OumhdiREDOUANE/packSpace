@@ -16,26 +16,9 @@ import Image from "next/image";
 //         { label: "Papier", value: "-" },
 //         { label: "Quantité", value: "-" },
 //       ];
-const images = [
-  {
-    thumb: "/FLY_Cat_300x300.jpg",
-    full: "/FLY_Cat_300x300.jpg",
-  },
-  {
-    thumb: "/ETUP_Cat_300x300.jpg",
-    full: "/ETUP_Cat_300x300.jpg",
-  },
-  {
-    thumb: "/CV_Cat_300x300.jpg",
-    full: "/CV_Cat_300x300.jpg",
-  },
-  {
-    thumb: "/DEP_Cat_300x300.jpg",
-    full: "/DEP_Cat_300x300.jpg",
-  },
-];
 
-export default function ProductGallery({ DetailsProprieter }) {
+
+export default function ProductGallery({ DetailsProprieter,images }) {
   const [selectedImage, setSelectedImage] = useState(images[0]);
 
   const galleryRef = useRef(null);
@@ -43,11 +26,11 @@ export default function ProductGallery({ DetailsProprieter }) {
   const openGallery = () => {
     const pswp = new PhotoSwipe({
       dataSource: images.map((img) => ({
-        src: img.full,
+        src: img.url,
         width: 566,
         height: 566
       })),
-      index: images.findIndex((img) => img.thumb === selectedImage.thumb),
+      index: images.findIndex((img) => img.url === selectedImage.url),
     });
 
     pswp.init();
@@ -68,13 +51,13 @@ export default function ProductGallery({ DetailsProprieter }) {
               key={idx}
               onClick={() => setSelectedImage(img)}
               className={`cursor-pointer border-2 overflow-hidden transition ${
-                selectedImage.thumb === img.thumb
+                selectedImage.url === img.url
                   ? "border-blue-500"
                   : "border-gray-300"
               }`}
             >
               <img
-                src={img.thumb}
+                src={img.url}
                 alt={`thumb-${idx}`}
                 width={69}
                 height={69}
@@ -88,7 +71,7 @@ export default function ProductGallery({ DetailsProprieter }) {
         <div className="w-full text-center">
           <button onClick={openGallery} className="relative group cursor-pointer">
             <img
-              src={selectedImage.thumb}
+              src={selectedImage.url}
               alt="Flyer"
               width={457} 
               height={625}

@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -15,49 +13,72 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface Category {
-  id_categorie: string
+  id_categorie?: number
   name_categorie: string
   description_categorie: string
-  productCount: number
-  
- 
+  url?: string
 }
 
 interface CategoryDialogProps {
   category: Category | null
   open: boolean
   onOpenChange: (open: boolean) => void
-  onSave: (category: Partial<Category>) => void
+  onSave: (data: FormData) => void
 }
 
 export function CategoryDialog({ category, open, onOpenChange, onSave }: CategoryDialogProps) {
   const [formData, setFormData] = useState({
     name_categorie: "",
-    description_categorie:""   
+    description_categorie: "",
+    image: null as File | null,
   })
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
+  // عند فتح الـ Dialog أو تعديل فئة، نملا الفورم بالبيانات الحالية
   useEffect(() => {
     if (category) {
       setFormData({
         name_categorie: category.name_categorie,
         description_categorie: category.description_categorie,
-        
+        image: null,
       })
+      setPreviewImage(category.url || null)
     } else {
       setFormData({
         name_categorie: "",
         description_categorie: "",
-       
+        image: null,
       })
+      setPreviewImage(null)
     }
+    if (fileInputRef.current) fileInputRef.current.value = ""
   }, [category, open])
+
+  // عند اختيار صورة جديدة
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      const file = e.target.files[0]
+      setFormData({ ...formData, image: file })
+
+      // عرض preview
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewImage(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
-    onSave(formData)
+    const data = new FormData()
+    data.append("name_categorie", formData.name_categorie)
+    data.append("description_categorie", formData.description_categorie)
+    if (formData.image) data.append("image", formData.image)
+    onSave(data)
   }
 
   return (
@@ -69,8 +90,10 @@ export function CategoryDialog({ category, open, onOpenChange, onSave }: Categor
             {category ? "Update the category information below." : "Create a new category for organizing products."}
           </DialogDescription>
         </DialogHeader>
+
         <form onSubmit={handleSubmit}>
           <div className="grid gap-4 py-4">
+            {/* Name */}
             <div className="grid gap-2">
               <Label htmlFor="name">Category Name</Label>
               <Input
@@ -81,6 +104,8 @@ export function CategoryDialog({ category, open, onOpenChange, onSave }: Categor
                 required
               />
             </div>
+
+            {/* Description */}
             <div className="grid gap-2">
               <Label htmlFor="description">Description</Label>
               <Textarea
@@ -89,10 +114,33 @@ export function CategoryDialog({ category, open, onOpenChange, onSave }: Categor
                 onChange={(e) => setFormData({ ...formData, description_categorie: e.target.value })}
                 placeholder="Enter category description"
                 rows={3}
+                required
               />
             </div>
+
+            {/* Preview Image */}
             
+
+            {/* Upload Image */}
+            <div className="grid gap-2">
+              <Label>Upload Image</Label>
+              <Input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                onChange={handleImageChange}
+              />
+            </div>
+            {previewImage && (
+              <div className="grid gap-2">
+                
+                <div className="relative w-20 h-20">
+                  <img src={previewImage} alt="preview" className="w-20 h-20 rounded object-cover border" />
+                </div>
+              </div>
+            )}
           </div>
+
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel

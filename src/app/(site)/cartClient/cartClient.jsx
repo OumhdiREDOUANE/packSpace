@@ -18,11 +18,11 @@ export default function CartClient({ sessionId, orders, token }) {
   const [dataOfOrders, setDataOfOrders] = useState(orders || []);
     const [loadingItems, setLoadingItems] = useState({});
   const router = useRouter();
-
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
   const url = sessionId
     ? token
-      ? `http://127.0.0.1:8000/api/cart/${sessionId}`
-      : `http://127.0.0.1:8000/api/cart/notLogin/${sessionId}`
+      ? `${API_BASE_URL}/cart/${sessionId}`
+      : `${API_BASE_URL}/cart/notLogin/${sessionId}`
     : null;
 
   const { data } = useSWR(url, (url) => fetcher(url, token), {
@@ -42,7 +42,7 @@ export default function CartClient({ sessionId, orders, token }) {
   const handleDelete = async (id_orderProduct) => {
     try {
       const sessionId = Cookies.get("session_id");
-      const response = await fetch(`http://127.0.0.1:8000/api/cart/notLogin/${id_orderProduct}`, {
+      const response = await fetch(`${API_BASE_URL}/cart/notLogin/${id_orderProduct}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json", "X-Session-Id": sessionId },
       });
@@ -53,7 +53,7 @@ export default function CartClient({ sessionId, orders, token }) {
       }));
       mutate(url);
     } catch (error) {
-      console.error("Error deleting order:", error);
+      
     }
   };
 
@@ -70,7 +70,7 @@ export default function CartClient({ sessionId, orders, token }) {
     }
     try {
       const sessionId = Cookies.get("session_id");
-      const response = await fetch(`http://127.0.0.1:8000/api/save/${id_orderProduct}`, {
+      const response = await fetch(`${API_BASE_URL}/save/${id_orderProduct}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -81,13 +81,13 @@ export default function CartClient({ sessionId, orders, token }) {
       if (!response.ok) throw new Error("Erreur sauvegarde");
       mutate(url);
     } catch (error) {
-      console.error(error);
+      
     }
   };
   const handleSubmit = async (id_orderProduct) => {
      try {
       setLoadingItems(prev => ({ ...prev, [id_orderProduct]: true }));
-      console.log(orders)
+      
       const sourceOrders = dataOfOrders?.data || [];
 const order = sourceOrders.find(o => o.id_orderProduct === id_orderProduct);
 if (!order) return; 
@@ -96,9 +96,9 @@ if (!order) return;
         payload[`selected_option_${index + 1}`] = item.options.id_ProductOption; 
       });
       payload.prix_orderProduct = order.prix_total
-     console.log(payload)
+    
       const sessionId = Cookies.get("session_id");
-      const response = await fetch("http://127.0.0.1:8000/api/product", {
+      const response = await fetch(`${API_BASE_URL}/product`, {
         method: "POST",
         headers: { "Content-Type": "application/json",
           "X-Session-Id": sessionId,
@@ -107,26 +107,25 @@ if (!order) return;
       });
       if (!response.ok) {
         const text = await response.text();
-        console.error("Server error:", text); 
+        
         setLoadingItems(prev => ({ ...prev, [id_orderProduct]: false }));
         return;
       }
   
       const data = await response.json();
-      console.log("Order saved:", data);
+     
      
 
         
       
       if (data.success === true) {
         
-        mutate(`http://127.0.0.1:8000/api/cart/notLogin/${sessionId}`);
+        mutate(`${API_BASE_URL}/cart/notLogin/${sessionId}`);
 
-       console.log(dataOfOrders)
       setLoadingItems(prev => ({ ...prev, [id_orderProduct]: false })); // stop loading
     } 
   }catch (error) {
-      console.error("Error saving order:", error);
+      
       setLoadingItems(prev => ({ ...prev, [id_orderProduct]: false })); // stop loading
     }
   };
@@ -147,7 +146,7 @@ const handleSuivre =  () => {
     }
     try {
       const sessionId = Cookies.get("session_id");
-      const response = await fetch(`http://127.0.0.1:8000/api/cart/valider-panier`, {
+      const response = await fetch(`${API_BASE_URL}/cart/valider-panier`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -159,7 +158,7 @@ const handleSuivre =  () => {
       if (!response.ok) throw new Error("Erreur validation panier");
       mutate(url);
     } catch (error) {
-      console.error(error);
+      
     }
   };
 

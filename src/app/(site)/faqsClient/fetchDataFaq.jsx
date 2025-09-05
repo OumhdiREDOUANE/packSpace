@@ -12,7 +12,24 @@ export default function FAQPage({faqItems}) {
  
   const [loading, setLoading] = useState(true)
   const [expandedFAQ, setExpandedFAQ] = useState(null)
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+const [settings, setSettings] = useState({
+    contact_phone: "",
+    contact_whatsapp: "",
+    contact_email: ""})
+    useEffect(() => {
+      const fetchSettings = async () => {
+        try {
+          const res = await fetch(`${API_BASE_URL}/setting`)
+          const data = await res.json()
+          setSettings(data)
+        } catch (err) {
+         throw new Error("Erreur lors du chargement des commandes");
+        } 
+      }
+  
+      fetchSettings()
+    }, [])
   useEffect(() => {
     // Simulate loading data
     const loadData = async () => {
@@ -24,7 +41,7 @@ export default function FAQPage({faqItems}) {
           icon: <Phone className="w-8 h-8" />,
           title: "par Téléphone",
           subtitle: "Du Lundi au Vendredi de 9h à 18h",
-          contact: "+212 5 20 20 32 36",
+          contact: settings.contact_phone || "",
           hours: "7jours/7 - 24h/24",
           color: "text-orange-500",
         },
@@ -34,7 +51,7 @@ export default function FAQPage({faqItems}) {
           icon: <Mail className="w-8 h-8" />,
           title: "par Email",
           subtitle: "7jours/7 - 24h/24",
-          contact: "contact@weprint.ma",
+          contact: settings.contact_email || "",
           hours: "",
           color: "text-pink-500",
         },
@@ -43,7 +60,7 @@ export default function FAQPage({faqItems}) {
           icon: <MessageCircle className="w-8 h-8" />,
           title: "par WhatsApp",
           subtitle: "Du Lundi au Vendredi de 9h à 18h",
-          contact: "+212 6 64 01 69 62",
+          contact: settings.contact_whatsapp || "",
           hours: "",
           color: "text-green-500",
         },

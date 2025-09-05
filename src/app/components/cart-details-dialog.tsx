@@ -58,9 +58,7 @@ export function CartDetailsDialog({ cart, open, onOpenChange }: CartDetailsDialo
   const formatDate = (dateString: string) => new Date(dateString).toLocaleString()
 
   const subtotal = cart.total_prix // assuming total_prix is already sum of items
-  const tax = subtotal * 0.08
-  const shipping = 9.99
-
+ 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
@@ -115,7 +113,7 @@ export function CartDetailsDialog({ cart, open, onOpenChange }: CartDetailsDialo
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">{item.prix_orderProduct}</p>
+                    <p className="font-medium">{item.prix_orderProduct} DH</p>
                   
                   </div>
                 </div>
@@ -135,7 +133,7 @@ export function CartDetailsDialog({ cart, open, onOpenChange }: CartDetailsDialo
               <Separator />
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total:</span>
-                <span>${cart.total_prix}</span>
+                <span>{cart.total_prix} DH</span>
               </div>
             </div>
           </div>

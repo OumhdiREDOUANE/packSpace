@@ -7,23 +7,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { CartDetailsDialog } from "@/components/cart-details-dialog"
-import { Search, Eye, ShoppingCart, Clock, Users, Trash2 } from "lucide-react"
+import { Search, Eye, Loader2 } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import Cookies from "js-cookie";
+import Cookies from "js-cookie"
+
 interface OrderItem {
   order_id: number
-  prix_orderProduct:string
+  prix_orderProduct: string
   product: {
     id_product: number
     name_product: string
     image: string | null
-    
   } | null
 }
 
 interface Panier {
   panier_id: number
-  role:string
+  role: string
   user: {
     id_user: number | null
     name: string | null
@@ -38,6 +38,8 @@ interface Panier {
 
 export function CartOverview() {
   const [carts, setCarts] = useState<Panier[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<string>("all")
   const [selectedCart, setSelectedCart] = useState<Panier | null>(null)
@@ -46,24 +48,25 @@ export function CartOverview() {
   useEffect(() => {
     const fetchCarts = async () => {
       try {
-        const token = Cookies.get("token") || "";
+        const token = Cookies.get("token") || ""
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
-        const res = await fetch("http://127.0.0.1:8000/api/CartDashboard", {
-          headers: token
-            ? { "Authorization": `Bearer ${token}` }
-            : {},
-        });
+        const res = await fetch(`${API_URL}/api/CartDashboard`, {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        })
 
-        if (!res.ok) {
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-        const data = await res.json();
-        console.log(data);
-        setCarts(data);
-      } catch (error) {
-        console.error("Error fetching carts:", error)
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+
+        const data = await res.json()
+        setCarts(data)
+      } catch (err: any) {
+        console.error("Error fetching carts:", err)
+        setError(err.message || "Error fetching carts")
+      } finally {
+        setLoading(false)
       }
     }
+
     fetchCarts()
   }, [])
 
@@ -81,13 +84,10 @@ export function CartOverview() {
     setIsCartDetailsOpen(true)
   }
 
-  const handleClearCart = (cartId: number) => {
-    setCarts(carts.filter((cart) => cart.panier_id !== cartId))
-  }
-
   const handleChangeStatus = async (cartId: number, newStatus: Panier["status"]) => {
     try {
-      const res = await fetch(`http://127.0.0.1:8000/api/CartDashboard/${cartId}`, {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+      const res = await fetch(`${API_URL}/api/CartDashboard/${cartId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status: newStatus }),
@@ -95,14 +95,11 @@ export function CartOverview() {
 
       if (!res.ok) throw new Error("Failed to update status")
 
-      // update local state
       setCarts((prev) =>
-        prev.map((c) =>
-          c.panier_id === cartId ? { ...c, status: newStatus } : c
-        )
+        prev.map((c) => (c.panier_id === cartId ? { ...c, status: newStatus } : c))
       )
-    } catch (error) {
-      console.error("Error updating status:", error)
+    } catch (err) {
+      console.error("Error updating status:", err)
     }
   }
 
@@ -123,16 +120,12 @@ export function CartOverview() {
 
   return (
     <div className="space-y-6">
-      {/* Statistics */}
-      {/* ... نفس البلوك ديال الكروت ما تبدلش ... */}
-
-      {/* Table */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <CardTitle>Paniers ({filteredCarts.length})</CardTitle>
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-4 mt-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -157,90 +150,103 @@ export function CartOverview() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Panier ID</TableHead>
-                  <TableHead>Customer</TableHead>
-                  <TableHead>Items</TableHead>
-                  <TableHead>Total</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Created At</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredCarts.map((cart) => (
-                  <TableRow key={cart.panier_id}>
-                    <TableCell>PAN-{cart.panier_id}</TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{cart.user?.name}</div>
-                        <div className="text-sm text-muted-foreground">{cart.user?.email}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        <div className="flex -space-x-2">
-                          {cart.orders.slice(0, 3).map((order, index) => (
-                            <img
-                              key={order.order_id}
-                              src={order.product?.image || "/placeholder.svg"}
-                              alt={order.product?.name_product || ""}
-                              className="h-8 w-8 rounded-full border-2 border-background object-cover"
-                              style={{ zIndex: cart.orders.length - index }}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-sm text-muted-foreground">
-                          {cart.orders.length} item{cart.orders.length > 1 ? "s" : ""}
-                        </span>
-                      </div>
-                    </TableCell>
-                    <TableCell>${cart.total_prix}</TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(cart.status)}>{cart.status}</Badge>
-                    </TableCell>
-                    <TableCell className="text-sm">{new Date(cart.created_at).toLocaleString()}</TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleViewCart(cart)}>
-                          <Eye className="h-4 w-4" />
-                        </Button>
-
-                        {/* تغيير الحالة */}
-                        {
-                          cart.role=="admin" &&(<Select
-                          value={cart.status}
-                          onValueChange={(val) => handleChangeStatus(cart.panier_id, val as Panier["status"])}
-                        >
-                          <SelectTrigger className="w-[120px]">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Pending">Pending</SelectItem>
-                            <SelectItem value="Completed">Completed</SelectItem>
-                            <SelectItem value="Delivered">Delivered</SelectItem>
-                            <SelectItem value="Cancelled">Cancelled</SelectItem>
-                          </SelectContent>
-                        </Select>
-                          )
-                        }
-                       
-
-                        
-                      </div>
-                    </TableCell>
+          {loading ? (
+            <div className="flex justify-center items-center py-10">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+              <span className="ml-2">Loading carts...</span>
+            </div>
+          ) : error ? (
+            <div className="text-center py-10 text-red-500">error</div>
+          ) : filteredCarts.length === 0 ? (
+            <div className="text-center py-10 text-muted-foreground">
+              No carts found.
+            </div>
+          ) : (
+            <div className="rounded-md border">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Panier ID</TableHead>
+                    <TableHead>Customer</TableHead>
+                    <TableHead>Items</TableHead>
+                    <TableHead>Total</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Created At</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {filteredCarts.map((cart) => (
+                    <TableRow key={cart.panier_id}>
+                      <TableCell>PAN-{cart.panier_id}</TableCell>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{cart.user?.name}</div>
+                          <div className="text-sm text-muted-foreground">{cart.user?.email}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center gap-2">
+                          <div className="flex -space-x-2">
+                            {cart.orders.slice(0, 3).map((order, index) => (
+                              <img
+                                key={order.order_id}
+                                src={order.product?.image || "/placeholder.svg"}
+                                alt={order.product?.name_product || ""}
+                                className="h-8 w-8 rounded-full border-2 border-background object-cover"
+                                style={{ zIndex: cart.orders.length - index }}
+                              />
+                            ))}
+                          </div>
+                          <span className="text-sm text-muted-foreground">
+                            {cart.orders.length} item{cart.orders.length > 1 ? "s" : ""}
+                          </span>
+                        </div>
+                      </TableCell>
+                      <TableCell>{cart.total_prix} DH</TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(cart.status)}>{cart.status}</Badge>
+                      </TableCell>
+                      <TableCell className="text-sm">
+                        {new Date(cart.created_at).toLocaleString()}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex items-center justify-end gap-2">
+                          <Button variant="ghost" size="sm" onClick={() => handleViewCart(cart)}>
+                            <Eye className="h-4 w-4" />
+                          </Button>
+                          <Select
+                            value={cart.status}
+                            onValueChange={(val) =>
+                              handleChangeStatus(cart.panier_id, val as Panier["status"])
+                            }
+                          >
+                            <SelectTrigger className="w-[120px]">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="Pending">Pending</SelectItem>
+                              <SelectItem value="Completed">Completed</SelectItem>
+                              <SelectItem value="Delivered">Delivered</SelectItem>
+                              <SelectItem value="Cancelled">Cancelled</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          )}
         </CardContent>
       </Card>
 
-      <CartDetailsDialog cart={selectedCart} open={isCartDetailsOpen} onOpenChange={setIsCartDetailsOpen} />
+      <CartDetailsDialog
+        cart={selectedCart}
+        open={isCartDetailsOpen}
+        onOpenChange={setIsCartDetailsOpen}
+      />
     </div>
   )
 }

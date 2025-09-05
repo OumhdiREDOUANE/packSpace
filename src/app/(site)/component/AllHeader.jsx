@@ -1,7 +1,8 @@
 import Header from "./Header";
 
 export default async function AllHeader(){
- const res = await fetch('http://127.0.0.1:8000/api/categories', {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+ const res = await fetch(`${API_BASE_URL}/categories`, {
   next: { revalidate: 60 }
 });
 const response = await res.json();

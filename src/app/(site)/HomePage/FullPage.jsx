@@ -4,7 +4,9 @@ import Home from './page';
 // Next.js Server Component أو Client Component حسب حاجتك
 export default async function FullPage() {
   // جلب البيانات من API
-  const res = await fetch('http://127.0.0.1:8000/api/categories', {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+
+  const res = await fetch(`${API_BASE_URL}/categories`, {
     next: { revalidate: 60 }, // إعادة التحقق كل 60 ثانية
   });
   const response = await res.json();
@@ -17,12 +19,12 @@ export default async function FullPage() {
     img: cat.url, // تأكد أن API ترجع image_categorie
 
   }));
-const resProducts = await fetch('http://127.0.0.1:8000/api/product/topProducts', {
+const resProducts = await fetch(`${API_BASE_URL}/product/topProducts`, {
     next: { revalidate: 60 },
   });
   if (!resProducts.ok) throw new Error(`HTTP error! status: ${resProducts.status}`);
   const responseProducts = await resProducts.json();
-console.log(responseProducts)
+
   const topProducts = responseProducts.data.map((prod) => ({
     id: prod.id_product,
     title: prod.name_product,

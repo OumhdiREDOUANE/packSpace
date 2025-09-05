@@ -29,12 +29,12 @@ export function OptionDashboardTable({ options, onEdit, onDelete }: OptionDashbo
               {/* Image + Title */}
               <div className="flex items-center space-x-4">
                 
-                <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+                <div className="w-20 h-20 bg-primary/10  flex items-center justify-center">
                    {option.image_option ? (
                     <img
                       src={option.image_option}
                       alt={option.name_option}
-                      className="w-full h-full object-cover rounded-full"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <ImageIcon className="h-6 w-6 text-muted-foreground" />

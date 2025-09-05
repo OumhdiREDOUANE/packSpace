@@ -37,7 +37,7 @@ const navigation = [
    { name: "Cart", href: "/cart", icon: ShoppingCart },
   { name: "Proprietors", href: "/proprietors", icon: UserCheck },
   { name: "Proprietor Options", href: "/proprietor-options", icon: Sliders },
-  { name: "Profile", href: "/profile", icon: User },
+
   { name: "Settings", href: "/settings", icon: Settings },
   { name: "Blogs", href: "/blogs", icon: FileText },
   { name: "FAQ", href: "/faq", icon: HelpCircle },

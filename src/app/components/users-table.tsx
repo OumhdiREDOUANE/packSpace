@@ -26,18 +26,22 @@ export function UsersTable() {
   const [isUserDialogOpen, setIsUserDialogOpen] = useState(false)
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false)
   const [userToDelete, setUserToDelete] = useState<User | null>(null)
+  const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
-
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
   // 🔹 Charger les utilisateurs depuis Laravel
-  const fetchUsers = async ()=>{
-await fetch("http://127.0.0.1:8000/api/users")
-      .then((res) => res.json())
-      .then((data) => {
-        // Laravel index retourne { data: [...] }
-        setUsers(data.data || [])
-      })
-      .catch((err) => console.error("Erreur de chargement des utilisateurs:", err))
+ const fetchUsers = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch(`${API_URL}/users`, { cache: "no-store" })
+      const data = await res.json()
+      setUsers(data.data || [])
+    } catch (err) {
+      console.error("Erreur de chargement des utilisateurs:", err)
+    } finally {
+      setLoading(false)
+    }
   }
   useEffect(() => {
     fetchUsers()
@@ -79,7 +83,7 @@ await fetch("http://127.0.0.1:8000/api/users")
     try {
       if (selectedUser) {
         // Update
-        const res = await fetch(`http://127.0.0.1:8000/api/users/${selectedUser.id_user}`, {
+        const res = await fetch(`${API_URL}/users/${selectedUser.id_user}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(userData),
@@ -88,7 +92,7 @@ await fetch("http://127.0.0.1:8000/api/users")
         
       } else {
         // Create
-        const res = await fetch(`http://127.0.0.1:8000/api/users`, {
+        const res = await fetch(`${API_URL}/users`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(userData),
@@ -109,7 +113,7 @@ await fetch("http://127.0.0.1:8000/api/users")
     if (!userToDelete) return
 
     try {
-      await fetch(`http://127.0.0.1:8000/api/users/${userToDelete.id_user}`, {
+      await fetch(`${API_URL}/users/${userToDelete.id_user}`, {
         method: "DELETE",
       })
       setUsers(users.filter((u) => u.id_user !== userToDelete.id_user))
@@ -164,27 +168,41 @@ await fetch("http://127.0.0.1:8000/api/users")
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedUsers.map((user) => (
-                <TableRow key={user.id_user}>
-                  <TableCell className="font-medium">{user.nomComplet}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.numero_telephone}</TableCell>
-                  <TableCell>
-                    <Badge className={getRoleColor(user.role)}>{user.role}</Badge>
-                  </TableCell>
-                  <TableCell>{user.created_at}</TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDeleteUser(user)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+               {loading ? (
+             <TableRow>
+                  <TableCell colSpan={6} className="text-center py-6">
+                    Loading users...
                   </TableCell>
                 </TableRow>
-              ))}
+              ) : paginatedUsers.length > 0 ? (
+                paginatedUsers.map((user) => (
+                  <TableRow key={user.id_user}>
+                    <TableCell className="font-medium">{user.nomComplet}</TableCell>
+                    <TableCell>{user.email}</TableCell>
+                    <TableCell>{user.numero_telephone}</TableCell>
+                    <TableCell>
+                      <Badge className={getRoleColor(user.role)}>{user.role}</Badge>
+                    </TableCell>
+                    <TableCell>{user.created_at}</TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <Button variant="ghost" size="sm" onClick={() => handleEditUser(user)}>
+                          <Edit className="h-4 w-4" />
+                        </Button>
+                        <Button variant="ghost" size="sm" onClick={() => handleDeleteUser(user)}>
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-6">
+                    No users found.
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>

@@ -31,7 +31,7 @@ export default function RegisterPage() {
       setMsg(message);
       setTimeout(() => router.push("/login"), 2000);
     } catch (err) {
-      setError(err.message || "Une erreur est survenue.");
+      setError( "Une erreur est survenue.");
     } finally {
       setLoading(false);
     }

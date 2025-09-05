@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Edit, Trash2, Building, Package } from "lucide-react"
+import { Edit, Trash2, Building, Package, Loader2 } from "lucide-react"
 
 interface Proprietor {
   id_proprieter: string
@@ -13,13 +13,37 @@ interface Proprietor {
   total_options_owned: number
   filtered_by_product?: number
 }
+
 interface ProprietorsTableProps {
   proprietors: Proprietor[]
   onEdit: (proprietor: Proprietor) => void
   onDelete: (proprietor: Proprietor) => void
+  loading?: boolean
+  error?:boolean
 }
 
-export function ProprietorsTable({ proprietors, onEdit, onDelete }: ProprietorsTableProps) {
+export function ProprietorsTable({ proprietors, onEdit, onDelete, loading ,error}: ProprietorsTableProps) {
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-10 space-x-2">
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <span className="text-muted-foreground">Loading proprietors...</span>
+      </div>
+    )
+  }
+  if (error) {
+    return (
+      <div className="flex justify-center items-center py-10 space-x-2">
+ 
+        <span className="text-muted-foreground">Error</span>
+      </div>
+    )
+  }
+
+  if (proprietors.length === 0) {
+    return <div className="text-center py-10 text-muted-foreground">No proprietors found.</div>
+  }
+
   return (
     <div className="space-y-4">
       {proprietors.map((proprietor) => (
@@ -55,12 +79,11 @@ export function ProprietorsTable({ proprietors, onEdit, onDelete }: ProprietorsT
               <Package className="h-4 w-4 text-muted-foreground" />
               <span className="text-sm">{proprietor.option_count} Options</span>
               <Package className="h-4 w-4 text-muted-foreground" />
-              <span className="text-sm">{proprietor.product_count} products</span>
+              <span className="text-sm">{proprietor.product_count} Products</span>
             </div>
           </CardContent>
         </Card>
       ))}
-      
     </div>
   )
 }

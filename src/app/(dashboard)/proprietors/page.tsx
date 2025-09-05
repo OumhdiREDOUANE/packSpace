@@ -8,7 +8,7 @@ import { DeleteProprietorDialog } from "@/components/delete-proprietor-dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Search, Plus } from "lucide-react"
+import { Search, Plus, Loader2 } from "lucide-react"
 import type { Proprietor } from "@/types/proprietor"
 
 interface Product {
@@ -24,21 +24,34 @@ export default function ProprietorsPage() {
   const [proprietorDialogOpen, setProprietorDialogOpen] = useState(false)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [productFilter, setProductFilter] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  // ✅ API URL flexible (localhost OR online)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
 
   // Fetch proprietors
   const fetchProprietors = async () => {
-    let url = "http://127.0.0.1:8000/api/proprieterDashboard"
-    if (productFilter) url += `?product_id=${productFilter}`
+    setLoading(true)
+    setError(null)
 
-    const res = await fetch(url, { cache: "no-store" })
-    const data = await res.json()
+    try {
+      let url = `${API_URL}/proprieterDashboard`
+      if (productFilter) url += `?product_id=${productFilter}`
 
-    setProprietors(data.proprieters || [])
-    setProducts(data.products || [])
+      const res = await fetch(url, { cache: "no-store" })
+      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+
+      const data = await res.json()
+      setProprietors(data.proprieters || [])
+      setProducts(data.products || [])
+    } catch (err: any) {
+      console.error("Error fetching proprietors:", err)
+      setError("Failed to load data. Please try again later.")
+    } finally {
+      setLoading(false)
+    }
   }
-
-  // Fetch products
-  
 
   useEffect(() => {
     fetchProprietors()
@@ -46,33 +59,41 @@ export default function ProprietorsPage() {
 
   // Save
   const handleSave = async (formData: Partial<Proprietor>) => {
-    if (selectedProprietor) {
-      await fetch(`http://127.0.0.1:8000/api/proprieterDashboard/${selectedProprietor.id_proprieter}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
-    } else {
-      await fetch("http://127.0.0.1:8000/api/proprieterDashboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      })
+    try {
+      if (selectedProprietor) {
+        await fetch(`${API_URL}/proprieterDashboard/${selectedProprietor.id_proprieter}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        })
+      } else {
+        await fetch(`${API_URL}/proprieterDashboard`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(formData),
+        })
+      }
+      setProprietorDialogOpen(false)
+      setSelectedProprietor(null)
+      fetchProprietors()
+    } catch (err) {
+      console.error("Error saving proprietor:", err)
     }
-    setProprietorDialogOpen(false)
-    setSelectedProprietor(null)
-    fetchProprietors()
   }
 
   // Delete
   const handleDelete = async () => {
     if (selectedProprietor) {
-      await fetch(`http://127.0.0.1:8000/api/proprieterDashboard/${selectedProprietor.id_proprieter}`, {
-        method: "DELETE",
-      })
-      setDeleteDialogOpen(false)
-      setSelectedProprietor(null)
-      fetchProprietors()
+      try {
+        await fetch(`${API_URL}/proprieterDashboard/${selectedProprietor.id_proprieter}`, {
+          method: "DELETE",
+        })
+        setDeleteDialogOpen(false)
+        setSelectedProprietor(null)
+        fetchProprietors()
+      } catch (err) {
+        console.error("Error deleting proprietor:", err)
+      }
     }
   }
 
@@ -122,12 +143,16 @@ export default function ProprietorsPage() {
           </Select>
         </div>
 
-        {/* Table */}
-        <ProprietorsTable
-          proprietors={filtered}
-          onEdit={(p) => { setSelectedProprietor(p); setProprietorDialogOpen(true) }}
-          onDelete={(p) => { setSelectedProprietor(p); setDeleteDialogOpen(true) }}
-        />
+        {/* ✅ Loading / Error / Empty States */}
+        
+          <ProprietorsTable
+            proprietors={filtered}
+            loading={loading}
+            error ={error}
+            onEdit={(p) => { setSelectedProprietor(p); setProprietorDialogOpen(true) }}
+            onDelete={(p) => { setSelectedProprietor(p); setDeleteDialogOpen(true) }}
+          />
+        
       </div>
 
       {/* Dialogs */}

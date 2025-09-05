@@ -140,6 +140,8 @@ export default function NavBar({ navItems, isMobileMenuOpen }) {
                 {navItems.map((item) => (
                   <div key={item.name} className="border-b border-gray-100">
                     {/* Main Category */}
+                    <Link
+                    href={`/category/${encodeURIComponent(item.name)}`}>
                     <button
                       onClick={() => toggleMobileDropdown(item.name)}
                       className="w-full flex items-center justify-between px-4 py-3 text-[#006294] font-bold uppercase hover:bg-gray-50 transition-colors duration-200"
@@ -148,7 +150,8 @@ export default function NavBar({ navItems, isMobileMenuOpen }) {
                       <ChevronDown
                         className={`h-4 w-4 transition-transform duration-200 ${expandedMobileItems.has(item.name) ? "rotate-180" : ""}`}
                       />
-                    </button>
+                    </button></Link>
+                    
 
                     {/* Dropdown submenu */}
                     <div

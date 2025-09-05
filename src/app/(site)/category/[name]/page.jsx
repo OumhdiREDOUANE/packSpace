@@ -1,7 +1,8 @@
 // app/category/page.tsx (أو أي ملف jsx/tsx حسب المسار)
 import Link from 'next/link';
 async function fetchProductsByCategory(name) {
-    const res = await fetch(`http://127.0.0.1:8000/api/categories/${name}`, {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+    const res = await fetch(`${API_BASE_URL}/categories/${name}`, {
      next: { revalidate: 60 } // لإلغاء التخزين المؤقت أثناء التطوير، احذف أو غيّر حسب الحاجة
     });
   
@@ -10,7 +11,7 @@ async function fetchProductsByCategory(name) {
     }
   
     const response = await res.json();
-    console.log(response)
+  
     return response.data || [];
   }
 export default async function CategoryPage({params}) {

@@ -2,34 +2,61 @@
 
 import { useState, useEffect } from "react"
 import { DashboardLayout } from "@/components/dashboard-layout"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Plus, Search, Edit, Trash2, Eye, Calendar } from "lucide-react"
 import { BlogDialog } from "@/components/blog-dialog"
 import { DeleteBlogDialog } from "@/components/delete-blog-dialog"
 import { BlogViewDialog } from "@/components/blog-view-dialog"
+
 export default function BlogsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [blogs, setBlogs] = useState<any[]>([])
   const [blogDialogOpen, setBlogDialogOpen] = useState(false)
   const [deleteBlogDialogOpen, setDeleteBlogDialogOpen] = useState(false)
   const [selectedBlog, setSelectedBlog] = useState<any | null>(null)
-const [viewDialogOpen, setViewDialogOpen] = useState(false)
-const [viewBlog, setViewBlog] = useState<any | null>(null)
+  const [viewDialogOpen, setViewDialogOpen] = useState(false)
+  const [viewBlog, setViewBlog] = useState<any | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+
+  // Fetch blogs from API
   const fetchBlogs = async () => {
-    const res = await fetch("http://127.0.0.1:8000/api/BlogDashboard")
-    const data = await res.json()
-    console.log(data)
-    setBlogs(data)
+    try {
+      const res = await fetch(`${API_BASE_URL}/BlogDashboard`)
+      if (!res.ok) throw new Error("Failed to fetch blogs")
+      const data = await res.json()
+      return data
+    } catch (err) {
+      console.error("Error fetching blogs:", err)
+      setError(true)
+      return []
+    }
   }
 
   useEffect(() => {
-    fetchBlogs()
+    const getBlogs = async () => {
+      setLoading(true)
+      setError(false)
+      const data = await fetchBlogs()
+      setBlogs(data)
+      setLoading(false)
+    }
+
+    getBlogs()
   }, [])
 
+  // Helper for status color
   const getStatusColor = (status: string) => {
     switch (status) {
       case "published":
@@ -41,6 +68,7 @@ const [viewBlog, setViewBlog] = useState<any | null>(null)
     }
   }
 
+  // Handlers
   const handleAddBlog = () => {
     setSelectedBlog(null)
     setBlogDialogOpen(true)
@@ -56,48 +84,56 @@ const [viewBlog, setViewBlog] = useState<any | null>(null)
     setDeleteBlogDialogOpen(true)
   }
 
+  const handleViewBlog = (blog: any) => {
+    setViewBlog(blog)
+    setViewDialogOpen(true)
+  }
+
   const handleSaveBlog = async (blogData: any) => {
-    if (selectedBlog) {
-      // Update
-      await fetch(`http://127.0.0.1:8000/api/BlogDashboard/${selectedBlog.id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(blogData),
-      })
-    } else {
-      // Create
-      await fetch("http://127.0.0.1:8000/api/BlogDashboard", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(blogData),
-      })
+    
+      if (selectedBlog) blogData.append("_method", "PUT");
+
+  try {
+    const url = selectedBlog
+      ? `${API_BASE_URL}/BlogDashboard/${selectedBlog.id}`
+      : `${API_BASE_URL}/BlogDashboard`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      body: blogData,
+    });
+
+    if (!res.ok) throw new Error("Failed to save Blog")
+      setBlogDialogOpen(false)
+      fetchBlogs()
+    } catch (err) {
+      console.error("Error saving blog:", err)
     }
-    setBlogDialogOpen(false)
-    fetchBlogs()
   }
 
   const handleConfirmDelete = async () => {
-    if (selectedBlog) {
-      await fetch(`http://127.0.0.1:8000/api/BlogDashboard/${selectedBlog.id}`, { method: "DELETE" })
+    try {
+      if (selectedBlog) {
+        await fetch(`${API_BASE_URL}/BlogDashboard/${selectedBlog.id}`, { method: "DELETE" })
+      }
+      setDeleteBlogDialogOpen(false)
+      fetchBlogs()
+    } catch (err) {
+      console.error("Error deleting blog:", err)
     }
-    setDeleteBlogDialogOpen(false)
-    fetchBlogs()
   }
 
+  // Filter blogs based on search
   const filteredBlogs = blogs.filter(
     (blog) =>
       blog.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       blog.category.toLowerCase().includes(searchTerm.toLowerCase())
   )
-  const handleViewBlog = (blog: any) => {
-  setViewBlog(blog)
-  setViewDialogOpen(true)
-}
-
 
   return (
     <DashboardLayout>
-<div className="space-y-6">
+      <div className="space-y-6">
+        {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Blog Management</h1>
           <Button onClick={handleAddBlog}>
@@ -106,6 +142,7 @@ const [viewBlog, setViewBlog] = useState<any | null>(null)
           </Button>
         </div>
 
+        {/* Search */}
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center gap-4">
@@ -122,84 +159,100 @@ const [viewBlog, setViewBlog] = useState<any | null>(null)
           </CardContent>
         </Card>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredBlogs.map((blog) => (
-            <Card key={blog.id} className="hover:shadow-lg transition-shadow">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <Badge variant="secondary">{blog.category}</Badge>
-                  <Badge variant="outline" className={`${getStatusColor(blog.status)} text-white border-0`}>
-                    {blog.status}
-                  </Badge>
-                </div>
-                <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
-                <CardDescription className="line-clamp-3">{blog.excerpt}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={blog.authorAvatar || "/placeholder.svg"} alt={blog.author} />
-                      <AvatarFallback>
-                        {blog.author
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <span className="text-sm text-muted-foreground">{blog.author}</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-4 w-4" />
-                      {new Date(blog.publishDate).toLocaleDateString()}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Eye className="h-4 w-4" />
-                      {blog.views} views
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Button variant="outline" size="sm" className="flex-1 bg-transparent"onClick={() => handleViewBlog(blog)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      View
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 bg-transparent"
-                      onClick={() => handleEditBlog(blog)}
-                    >
-                      <Edit className="h-4 w-4 mr-1" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="text-red-500 hover:text-red-700 bg-transparent"
-                      onClick={() => handleDeleteBlog(blog)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {filteredBlogs.length === 0 && (
+        {/* Loader / Error / Empty / Blog Cards */}
+        {loading ? (
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-muted-foreground">Loading blogs...</p>
+            </CardContent>
+          </Card>
+        ) : error ? (
+          <Card>
+            <CardContent className="text-center py-12">
+              <p className="text-red-500">Error fetching blogs. Please try again later.</p>
+            </CardContent>
+          </Card>
+        ) : filteredBlogs.length === 0 ? (
           <Card>
             <CardContent className="text-center py-12">
               <p className="text-muted-foreground">No blog posts found matching your search.</p>
             </CardContent>
           </Card>
+        ) : (
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {filteredBlogs.map((blog) => (
+              <Card key={blog.id} className="hover:shadow-lg transition-shadow">
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <Badge variant="secondary">{blog.category}</Badge>
+                    <Badge
+                      variant="outline"
+                      className={`${getStatusColor(blog.status)} text-white border-0`}
+                    >
+                      {blog.status}
+                    </Badge>
+                  </div>
+                  <CardTitle className="line-clamp-2">{blog.title}</CardTitle>
+                  <CardDescription className="line-clamp-3">{blog.excerpt}</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">{blog.author}</span>
+                    </div>
+
+                    <div className="flex items-center justify-between text-sm text-muted-foreground">
+                      <div className="flex items-center gap-1">
+                        <Calendar className="h-4 w-4" />
+                        {new Date(blog.publishDate).toLocaleDateString()}
+                      </div>
+                      
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 bg-transparent"
+                        onClick={() => handleViewBlog(blog)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        View
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 bg-transparent"
+                        onClick={() => handleEditBlog(blog)}
+                      >
+                        <Edit className="h-4 w-4 mr-1" />
+                        Edit
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-red-500 hover:text-red-700 bg-transparent"
+                        onClick={() => handleDeleteBlog(blog)}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         )}
       </div>
+
+      {/* Dialogs */}
       <BlogViewDialog open={viewDialogOpen} onOpenChange={setViewDialogOpen} blog={viewBlog} />
-      <BlogDialog open={blogDialogOpen} onOpenChange={setBlogDialogOpen} blog={selectedBlog} onSave={handleSaveBlog} />
+      <BlogDialog
+        open={blogDialogOpen}
+        onOpenChange={setBlogDialogOpen}
+        blog={selectedBlog}
+        onSave={handleSaveBlog}
+      />
       <DeleteBlogDialog
         open={deleteBlogDialogOpen}
         onOpenChange={setDeleteBlogDialogOpen}

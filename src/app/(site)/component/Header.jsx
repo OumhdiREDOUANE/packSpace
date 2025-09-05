@@ -23,18 +23,18 @@ const [cartCount,setCartCount] = useState(0);
 
   const router = useRouter();
   const { isLoggedIn, logout } = useAuth();
-
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
   // Logout
   const handleLogout = async () => {
   try {
     await request("/logout", { method: "POST", auth: true });
     // removeToken();  <-- supprime cette ligne
-    Cookies.remove("session_id"); // supprime ton token ou session
+    Cookies.remove("session_id",{ path: "/" }); // supprime ton token ou session
 
     logout();
     router.push("/");
   } catch (e) {
-    console.error("Logout error:", e.message);
+     throw new Error("Erreur lors du chargement des commandes");
   }
 };
  function generateSessionId() {
@@ -56,41 +56,86 @@ const [cartCount,setCartCount] = useState(0);
  
     
     // كلما المستخدم دار أي حركة (click / scroll / keypress) نجدد الوقت
-  
+ const  fetchCount= async (sessionId,token)=>{
+   let res;
 
+  if (token) {
+    res = await fetch(`${API_BASE_URL}/count?session_user=${sessionId}`, {
+      cache: "no-store",
+      credentials: "include",
+      headers: { "Authorization": `Bearer ${token}` },
+    });
+  } else {
+    res = await fetch(`${API_BASE_URL}/count/notLogin?session_user=${sessionId}`, {
+      cache: "no-store",
+      credentials: "include",
+    });
+  }
 
-  useEffect(() => {
-      setSession();
+  if (!res.ok) {
+    const text = await res.text();
   
-      const resetSessionTimer = () => {
-        if (Cookies.get("session_id")) {
-          const expiryTime = Date.now() + SESSION_TIMEOUT;
-          Cookies.set("session_expiry", expiryTime.toString(), { path: "/" });
-        }
-      };
+    throw new Error("Erreur lors du chargement des commandes");
+  }
+
+  const data = await res.json();
   
-      ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
-        window.addEventListener(evt, resetSessionTimer)
-      );
+ setCartCount(data.countOfOrder)
+ }
+useEffect(()=>{
+  const sessionId = Cookies.get("session_id")
+  const token = Cookies.get("token")
+if(sessionId){
+  fetchCount(sessionId,token)
+}else{
+   setCartCount(0)
+}
+const interval = setInterval(() => {
+
+      if (sessionId) {
+        fetchCount(sessionId, token)
+      }else{
+   setCartCount(0)
+}
+    }, 3000)
+
+    // تنظيف عند تفكيك الـ component
+    return () => clearInterval(interval)
+
+},[])
+
+  // useEffect(() => {
+  //     setSession();
   
-      const intervalId = setInterval(() => {
-        const expiry = parseInt(Cookies.get("session_expiry") || "0");
-        if (Date.now() > expiry) {
-          // انتهت الصلاحية → حذف الكوكيز
-          Cookies.remove("session_id", { path: "/" });
-          Cookies.remove("session_expiry", { path: "/" });
-          console.log("Session expired");
-          clearInterval(intervalId); // يمكن توقف التحقق بعد انتهاء session
-        }
-      }, 1000);
+  //     const resetSessionTimer = () => {
+  //       if (Cookies.get("session_id")) {
+  //         const expiryTime = Date.now() + SESSION_TIMEOUT;
+  //         Cookies.set("session_expiry", expiryTime.toString(), { path: "/" });
+  //       }
+  //     };
+  
+  //     ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
+  //       window.addEventListener(evt, resetSessionTimer)
+  //     );
+  
+  //     const intervalId = setInterval(() => {
+  //       const expiry = parseInt(Cookies.get("session_expiry") || "0");
+  //       if (Date.now() > expiry) {
+  //         // انتهت الصلاحية → حذف الكوكيز
+  //         Cookies.remove("session_id", { path: "/" });
+  //         Cookies.remove("session_expiry", { path: "/" });
+  //         console.log("Session expired");
+  //         clearInterval(intervalId); // يمكن توقف التحقق بعد انتهاء session
+  //       }
+  //     }, 1000);
    
-    return () => {
-      ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
-        window.removeEventListener(evt, resetSessionTimer)
-      );
-      clearInterval(intervalId);
-    };
-   }, []);
+  //   return () => {
+  //     ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
+  //       window.removeEventListener(evt, resetSessionTimer)
+  //     );
+  //     clearInterval(intervalId);
+  //   };
+  //  }, []);
   
 
   // ---------------- Search ----------------
@@ -102,11 +147,11 @@ const [cartCount,setCartCount] = useState(0);
 
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`http://127.0.0.1:8000/api/product?search=${searchQuery}`);
+        const res = await fetch(`${API_BASE_URL}/product?search=${searchQuery}`);
         const data = await res.json();
         setSearchResults(data.data || []);
       } catch (err) {
-        console.error(err);
+         throw new Error("Erreur lors du chargement des commandes");
       }
     }, 300);
 

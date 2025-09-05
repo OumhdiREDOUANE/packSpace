@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect,useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,18 +14,18 @@ interface ProprietorOptionDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   option?: any | null
-  onSaved?: () => void
+  onSave?: () => void
     proprieters: { id_proprieter: string; name_proprieter: string }[] // قائمة Proprietors
   products: { id_product: string; name_product: string }[]
 }
 
 export function ProprietorOptionDialog({ open, onOpenChange, option,proprieters,products, onSave }: ProprietorOptionDialogProps) {
-
-  
+const fileInputRef = useRef<HTMLInputElement>(null)
+    const [previewImage, setPreviewImage] = useState<string | null>(null)
   const [formData, setFormData] = useState({
     name_option: "",
     description_option: "",
-    image_option: "",
+    image:null as File | null ,
     proprieter_id: "",
     product_id: "",
     prix: "",
@@ -41,29 +41,54 @@ export function ProprietorOptionDialog({ open, onOpenChange, option,proprieters,
       setFormData({
         name_option: option.name_option,
         description_option: option.description_option,
-        image_option: option.image_option,
+        image: null,
         proprieter_id: "",
         product_id: "" ,
-        prix: option.prix ? String(option.prix) : "" ,
+        prix: option.prix,
        
       })
+      setPreviewImage(option.image_option || null)
     } else {
       setFormData({
         name_option: "",
         description_option: "",
-        image_option: "",
+        image: null,
         proprieter_id: "",
         product_id: "",
         prix: "",
        
       })
+      setPreviewImage(null)
     }
+    if (fileInputRef.current) fileInputRef.current.value = ""
   }, [option, open])
 
    const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault()
-      onSave(formData)
+          const data = new FormData()
+    data.append("name_option", formData.name_option)
+    data.append("description_option", formData.description_option)
+    data.append("proprieter_id", formData.proprieter_id)
+    data.append("product_id", formData.product_id)
+    data.append("prix", formData.prix)
+
+    
+    if (formData.image) data.append("image", formData.image)
+      onSave(data)
     }
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files && e.target.files[0]) {
+          const file = e.target.files[0]
+          setFormData({ ...formData, image: file })
+    
+          // عرض preview
+          const reader = new FileReader()
+          reader.onloadend = () => {
+            setPreviewImage(reader.result as string)
+          }
+          reader.readAsDataURL(file)
+        }
+      }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -124,15 +149,15 @@ export function ProprietorOptionDialog({ open, onOpenChange, option,proprieters,
               <div className="space-y-3">
                 
                   <div  className="flex items-start gap-3 p-3 border rounded-lg">
-                    <Input
-                      value={formData.image_option}
-                         onChange={(e) => setFormData({...formData, image_option: e.target.value})}
-                      placeholder="Enter image URL"
-                      required
-                    />
-                    {formData.image_option && (
+                   <Input
+                                   type="file"
+                                   accept="image/*"
+                                   ref={fileInputRef}
+                                   onChange={handleImageChange}
+                                 />
+                    {previewImage && (
                       <img
-                        src={formData.image_option}
+                        src={previewImage}
                         alt={`Product image `}
                         className="h-16 w-16 rounded-md object-cover border"
                       />

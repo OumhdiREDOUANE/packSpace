@@ -7,14 +7,12 @@ export default function DashboardPage() {
   return (
     <DashboardLayout>
       <div className="space-y-6">
-        <div>
+        <div className="text-center">
           <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
           <p className="text-muted-foreground">Welcome to your project management dashboard</p>
         </div>
 
-        <StatsCards />
-        <DashboardCharts />
-        <RecentOrders />
+       
       </div>
     </DashboardLayout>
   )

@@ -42,33 +42,33 @@ export default function Home({ categories,products }) {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSuccess(false);
-    setError("");
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setSuccess(false);
+  //   setError("");
 
-    try {
-      const res = await fetch(
-        "https://8f66f120.sibforms.com/serve/MUIEAHAEJVaLKICpv8v63ir3Th99jR9aXe-17_fQKVQbB8m_Q73342xUKk6Tk2l0weR5u6nNYsiX7JK07z4ndKFMbjCVfowIiu-EvlMQnWZwnzct_CXOw70OCz2jDlaM7Ktc4KVfCePUWQw_8YRLCs8FC38_LskuwKJlv1OvXhQc_ocH1sAJO9uyGRY9NHr6karp6elLFgXF7oDb",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({ EMAIL: email }).toString(),
-        }
-      );
+  //   try {
+  //     const res = await fetch(
+  //       "https://8f66f120.sibforms.com/serve/MUIEAHAEJVaLKICpv8v63ir3Th99jR9aXe-17_fQKVQbB8m_Q73342xUKk6Tk2l0weR5u6nNYsiX7JK07z4ndKFMbjCVfowIiu-EvlMQnWZwnzct_CXOw70OCz2jDlaM7Ktc4KVfCePUWQw_8YRLCs8FC38_LskuwKJlv1OvXhQc_ocH1sAJO9uyGRY9NHr6karp6elLFgXF7oDb",
+  //       {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/x-www-form-urlencoded",
+  //         },
+  //         body: new URLSearchParams({ EMAIL: email }).toString(),
+  //       }
+  //     );
 
-      if (res.ok) {
-        setSuccess(true);
-        setEmail("");
-      } else {
-        setError("Votre abonnement n'a pas pu être enregistré. Veuillez réessayer.");
-      }
-    } catch (err) {
-      setError("Une erreur est survenue. Veuillez réessayer.");
-    }
-  };
+  //     if (res.ok) {
+  //       setSuccess(true);
+  //       setEmail("");
+  //     } else {
+  //       setError("Votre abonnement n'a pas pu être enregistré. Veuillez réessayer.");
+  //     }
+  //   } catch (err) {
+  //     setError("Une erreur est survenue. Veuillez réessayer.");
+  //   }
+  // };
   // Auto-play functionality
   useEffect(() => {
     if (!isAutoPlaying) return

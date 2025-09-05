@@ -18,16 +18,16 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(false);
-
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   useEffect(() => {
     if (verifyUrl) {
-      const backendUrl = "http://127.0.0.1:8000" + verifyUrl;
+      const backendUrl = API_BASE_URL + verifyUrl;
       fetch(backendUrl, { method: "GET", credentials: "include" })
         .then((res) => res.json())
         .then((data) => {
           alert(data.message || "Votre e-mail a été vérifié avec succès !");
         })
-        .catch((err) => console.error(err));
+     
     }
   }, [verifyUrl]);
 
@@ -58,7 +58,7 @@ export default function LoginPage() {
       }
     } catch (err) {
       console.error(err);
-      setError(err.message || "Une erreur inconnue est survenue.");
+      setError( "Une erreur inconnue est survenue.");
     } finally {
       setLoading(false);
     }

@@ -4,23 +4,23 @@ import { cookies } from "next/headers";
 
 async function getOrders(sessionId, token) {
   let res;
-
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
   if (token) {
-    res = await fetch(`http://127.0.0.1:8000/api/cart/${sessionId}`, {
+    res = await fetch(`${API_BASE_URL}/cart/${sessionId}`, {
       cache: "no-store",
       credentials: "include",
       headers: { "Authorization": `Bearer ${token}` },
     });
   } else {
-    res = await fetch(`http://127.0.0.1:8000/api/cart/notLogin/${sessionId}`, {
+    res = await fetch(`${API_BASE_URL}/cart/notLogin/${sessionId}`, {
       cache: "no-store",
       credentials: "include",
     });
   }
-console.log(res)
+
   if (!res.ok) {
     const text = await res.text();
-    console.error("Laravel API error:", res.status, text);
+
     throw new Error("Erreur lors du chargement des commandes");
   }
 

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import ProductGallery from "./ProductImag";
 import FlyerFormat from "./ProductProprieter";
 
-export default function ProductPage({ product }) {
+export default function ProductPage({ product ,images}) {
   const flyerRef = useRef(null);
   const galleryRef = useRef(null);
   const [scrollPassed, setScrollPassed] = useState(false);
@@ -37,7 +37,7 @@ export default function ProductPage({ product }) {
         }`}
         style={{ alignSelf: "start" }}
       >
-        <ProductGallery DetailsProprieter={DetailsProprieter} />
+        <ProductGallery DetailsProprieter={DetailsProprieter} images={images} />
       </div>
 
       {/* Flyer Format Section */}

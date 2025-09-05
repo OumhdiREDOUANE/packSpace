@@ -67,8 +67,7 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onUpdateStatus }
   }
 
   const subtotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const tax = subtotal * 0.08 // 8% tax
-  const shipping = 9.99
+  
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -122,8 +121,8 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onUpdateStatus }
                     <p className="text-sm text-muted-foreground">Option: {item.name}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium">${(item.price * item.quantity).toFixed(2)}</p>
-                    <p className="text-sm text-muted-foreground">${item.price.toFixed(2)} each</p>
+                    <p className="font-medium">{item.price.toFixed(2)} DH</p>
+                
                   </div>
                 </div>
               ))}
@@ -140,7 +139,7 @@ export function OrderDetailsDialog({ order, open, onOpenChange, onUpdateStatus }
               <Separator />
               <div className="flex justify-between font-semibold text-lg">
                 <span>Total:</span>
-                <span>${order.total.toFixed(2)}</span>
+                <span>{order.total.toFixed(2)} DH</span>
               </div>
             </div>
           </div>

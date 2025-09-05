@@ -51,24 +51,28 @@ export default function Footer() {
   
         {/* Left Column - Navigation Links */}
         <div className="col-span-3 space-y-3">
-          <a href="#" className="flex items-center text-[#004466] hover:text-[#C09200] transition-colors duration-200 ">
+          <a href="/qui_sommes_nous" className="flex items-center text-[#004466] hover:text-[#C09200] transition-colors duration-200 ">
             <span className="text-[#8ca9bb] mr-2"><img src="/share.png" alt="Logo" className="h-8 w-auto" /></span>
             Qui sommes-nous ?
           </a>
-          <a href="#" className="flex items-center text-[#004466] hover:text-[#C09200] transition-colors duration-200">
+          <a href="/contact" className="flex items-center text-[#004466] hover:text-[#C09200] transition-colors duration-200">
             <span className="text-[#8ca9bb] mr-2"><img src="/share.png" alt="Logo" className="h-8 w-auto" /></span>
-            Nos équipements
+            Contact
           </a>
         </div>
   
         {/* Center Left Column - More Links */}
         <div className="col-span-2 space-y-3">
-          {['Blog', 'F.A.Q', 'Contact'].map((item) => (
-            <a key={item} href="#" className="flex items-center text-[#004466] hover:text-[#C09200] transition-colors duration-200 ">
+        
+            <a  href="/blogsClient" className="flex items-center text-[#004466] hover:text-[#C09200] transition-colors duration-200 ">
               <span className="text-[#8ca9bb] mr-2"><img src="/share.png" alt="Logo" className="h-8 w-auto" /></span>
-              {item}
+              Blog
             </a>
-          ))}
+            <a  href="/faqsClient" className="flex items-center text-[#004466] hover:text-[#C09200] transition-colors duration-200 ">
+              <span className="text-[#8ca9bb] mr-2"><img src="/share.png" alt="Logo" className="h-8 w-auto" /></span>
+              F.A.Q
+            </a>
+          
         </div>
   
         {/* Center Column - Logos */}
@@ -108,20 +112,28 @@ export default function Footer() {
         {/* Navigation Links - Two Columns */}
         <div className="grid grid-cols-2 gap-3">
           <div className="space-y-3">
-            {['Qui sommes-nous ?', 'Nos engagements', 'Nos équipements'].map((item) => (
-              <a key={item} href="#" className="flex items-center hover:text-[#C09200] transition-colors duration-200">
+    
+              <a href="/qui_sommes_nous" className="flex items-center hover:text-[#C09200] transition-colors duration-200">
                 <span className="text-[#8ca9bb] mr-2"><img src="/share.png" alt="Logo" className="h-8 w-auto" /></span>
-                {item}
+                 Qui sommes-nous ?
               </a>
-            ))}
+               <a href="/contact" className="flex items-center hover:text-[#C09200] transition-colors duration-200">
+                <span className="text-[#8ca9bb] mr-2"><img src="/share.png" alt="Logo" className="h-8 w-auto" /></span>
+                Contact
+              </a>
+            
           </div>
           <div className="space-y-3">
-            {['Blog', 'F.A.Q', 'Contact'].map((item) => (
-              <a key={item} href="#" className="flex items-center hover:text-[#C09200] transition-colors duration-200">
+           
+              <a  href="/blogsClient"  className="flex items-center hover:text-[#C09200] transition-colors duration-200">
                 <span className="text-[#8ca9bb] mr-2"><img src="/share.png" alt="Logo" className="h-8 w-auto" /></span>
-                {item}
+                Blog
               </a>
-            ))}
+              <a  href="/faqsClient"  className="flex items-center hover:text-[#C09200] transition-colors duration-200">
+                <span className="text-[#8ca9bb] mr-2"><img src="/share.png" alt="Logo" className="h-8 w-auto" /></span>
+                F.A.Q
+              </a>
+           
           </div>
         </div>
   

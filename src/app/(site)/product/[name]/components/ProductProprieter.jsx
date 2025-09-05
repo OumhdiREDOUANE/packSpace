@@ -168,7 +168,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
   if (hasMissing) return;
 
     console.log(dataPost)
-    
+    console.log(sessionId)
       
     try {
       const payload = {};
@@ -195,7 +195,8 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
     
       const data = await response.json();
       console.log("Order saved:", data);
-    
+     const text = await response.text(); // اقرأ نص الرد أولاً
+  console.log("Raw response:", text);
       
     
     } catch (error) {
@@ -217,7 +218,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
       </p>
 
       {/* Options */}
-      <form method="post">
+      <form method="post" onSubmit={(e)=>handleSubmit(e)}>
       {product.proprieter.map((proprieter) => (
         <div
           key={proprieter.name_proprieter}
@@ -327,10 +328,10 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
         <button
           onClick={(e)=>{
             handleAddToCart(e)
-            handleSubmit(e)
+            
           }
         }
-        
+        type='submit'
         
           className="mt-4 w-full hover:bg-[#006294] hover:text-[#C09200] bg-[#C09200] text-[#FFFFFF] py-3 rounded transition-colors"
         >
