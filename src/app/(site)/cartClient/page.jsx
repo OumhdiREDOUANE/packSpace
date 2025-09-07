@@ -4,15 +4,15 @@ import { cookies } from "next/headers";
 
 async function getOrders(sessionId, token) {
   let res;
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   if (token) {
-    res = await fetch(`${API_BASE_URL}/cart/${sessionId}`, {
+    res = await fetch(`${API_BASE_URL}/api/cart/${sessionId}`, {
       cache: "no-store",
       credentials: "include",
       headers: { "Authorization": `Bearer ${token}` },
     });
   } else {
-    res = await fetch(`${API_BASE_URL}/cart/notLogin/${sessionId}`, {
+    res = await fetch(`${API_BASE_URL}/api/cart/notLogin/${sessionId}`, {
       cache: "no-store",
       credentials: "include",
     });

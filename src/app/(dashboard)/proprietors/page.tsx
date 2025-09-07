@@ -28,7 +28,7 @@ export default function ProprietorsPage() {
   const [error, setError] = useState<string | null>(null)
 
   // ✅ API URL flexible (localhost OR online)
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
   // Fetch proprietors
   const fetchProprietors = async () => {
@@ -36,18 +36,18 @@ export default function ProprietorsPage() {
     setError(null)
 
     try {
-      let url = `${API_URL}/proprieterDashboard`
+      let url = `${API_URL}/api/proprieterDashboard`
       if (productFilter) url += `?product_id=${productFilter}`
 
       const res = await fetch(url, { cache: "no-store" })
-      if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+      if (!res.ok)      throw new Error("Erreur lors du chargement des commandes");
 
       const data = await res.json()
       setProprietors(data.proprieters || [])
       setProducts(data.products || [])
     } catch (err: any) {
-      console.error("Error fetching proprietors:", err)
       setError("Failed to load data. Please try again later.")
+          throw new Error("Erreur lors du chargement des commandes");
     } finally {
       setLoading(false)
     }
@@ -61,13 +61,13 @@ export default function ProprietorsPage() {
   const handleSave = async (formData: Partial<Proprietor>) => {
     try {
       if (selectedProprietor) {
-        await fetch(`${API_URL}/proprieterDashboard/${selectedProprietor.id_proprieter}`, {
+        await fetch(`${API_URL}/api/proprieterDashboard/${selectedProprietor.id_proprieter}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
         })
       } else {
-        await fetch(`${API_URL}/proprieterDashboard`, {
+        await fetch(`${API_URL}/api/proprieterDashboard`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(formData),
@@ -77,7 +77,7 @@ export default function ProprietorsPage() {
       setSelectedProprietor(null)
       fetchProprietors()
     } catch (err) {
-      console.error("Error saving proprietor:", err)
+         throw new Error("Erreur lors du chargement des commandes");
     }
   }
 
@@ -85,14 +85,14 @@ export default function ProprietorsPage() {
   const handleDelete = async () => {
     if (selectedProprietor) {
       try {
-        await fetch(`${API_URL}/proprieterDashboard/${selectedProprietor.id_proprieter}`, {
+        await fetch(`${API_URL}/api/proprieterDashboard/${selectedProprietor.id_proprieter}`, {
           method: "DELETE",
         })
         setDeleteDialogOpen(false)
         setSelectedProprietor(null)
         fetchProprietors()
       } catch (err) {
-        console.error("Error deleting proprietor:", err)
+      throw new Error("Erreur lors du chargement des commandes");
       }
     }
   }

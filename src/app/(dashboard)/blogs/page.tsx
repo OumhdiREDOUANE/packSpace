@@ -28,19 +28,19 @@ export default function BlogsPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(false)
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
   // Fetch blogs from API
   const fetchBlogs = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/BlogDashboard`)
+      const res = await fetch(`${API_BASE_URL}/api/BlogDashboard`)
       if (!res.ok) throw new Error("Failed to fetch blogs")
       const data = await res.json()
       return data
     } catch (err) {
-      console.error("Error fetching blogs:", err)
       setError(true)
-      return []
+      throw new Error("Erreur lors du chargement des commandes");
+   
     }
   }
 
@@ -95,8 +95,8 @@ export default function BlogsPage() {
 
   try {
     const url = selectedBlog
-      ? `${API_BASE_URL}/BlogDashboard/${selectedBlog.id}`
-      : `${API_BASE_URL}/BlogDashboard`;
+      ? `${API_BASE_URL}/api/BlogDashboard/${selectedBlog.id}`
+      : `${API_BASE_URL}/api/BlogDashboard`;
 
     const res = await fetch(url, {
       method: "POST",
@@ -107,19 +107,19 @@ export default function BlogsPage() {
       setBlogDialogOpen(false)
       fetchBlogs()
     } catch (err) {
-      console.error("Error saving blog:", err)
+           throw new Error("Erreur lors du chargement des commandes");
     }
   }
 
   const handleConfirmDelete = async () => {
     try {
       if (selectedBlog) {
-        await fetch(`${API_BASE_URL}/BlogDashboard/${selectedBlog.id}`, { method: "DELETE" })
+        await fetch(`${API_BASE_URL}/api/BlogDashboard/${selectedBlog.id}`, { method: "DELETE" })
       }
       setDeleteBlogDialogOpen(false)
       fetchBlogs()
     } catch (err) {
-      console.error("Error deleting blog:", err)
+          throw new Error("Erreur lors du chargement des commandes");
     }
   }
 

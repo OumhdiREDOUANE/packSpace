@@ -58,8 +58,8 @@ export default function FAQPage() {
       setFaqs(data)
       setError(false)
     } catch (err) {
-      console.error("Error fetching FAQs:", err)
       setError(true)
+      throw new Error("Erreur lors du chargement des commandes");
     } finally {
       setLoading(false)
     }
@@ -120,7 +120,7 @@ export default function FAQPage() {
         setFaqs([...faqs, newFaq])
       }
     } catch (err) {
-      console.error("Error saving FAQ:", err)
+          throw new Error("Erreur lors du chargement des commandes");
     } finally {
       setFaqDialogOpen(false)
       setSelectedFaq(null)
@@ -136,7 +136,7 @@ export default function FAQPage() {
         setFaqs(faqs.filter((f) => f.id !== selectedFaq.id))
       }
     } catch (err) {
-      console.error("Error deleting FAQ:", err)
+          throw new Error("Erreur lors du chargement des commandes");
     } finally {
       setDeleteFaqDialogOpen(false)
       setSelectedFaq(null)

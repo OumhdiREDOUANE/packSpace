@@ -20,7 +20,7 @@ interface Product {
 }
 
 export function ProductsTable() {
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
   const [products, setProducts] = useState<Product[]>([])
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null)
@@ -38,7 +38,7 @@ export function ProductsTable() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API_URL}/productDashboard`)
+      const res = await fetch(`${API_URL}/api/productDashboard`)
       if (!res.ok) throw new Error("Failed to fetch products")
       const data = await res.json()
       setProducts(data.data)
@@ -94,12 +94,12 @@ export function ProductsTable() {
     try {
       if (selectedProduct) {
         formDataToSend.append("_method", "PUT")
-        await fetch(`${API_URL}/productDashboard/${selectedProduct.id_product}`, {
+        await fetch(`${API_URL}/api/productDashboard/${selectedProduct.id_product}`, {
           method: "POST",
           body: formDataToSend,
         })
       } else {
-        await fetch(`${API_URL}/productDashboard`, {
+        await fetch(`${API_URL}/api/productDashboard`, {
           method: "POST",
           body: formDataToSend,
         })
@@ -107,7 +107,7 @@ export function ProductsTable() {
       await fetchProducts()
       setIsProductDialogOpen(false)
     } catch (err) {
-      console.error(err)
+           throw new Error("Erreur lors du chargement des commandes");
     }
   }
 
@@ -119,14 +119,13 @@ export function ProductsTable() {
   const handleConfirmDelete = async () => {
     if (!productToDelete) return
     try {
-      await fetch(`${API_URL}/productDashboard/${productToDelete.id_product}`, {
+      await fetch(`${API_URL}/api/productDashboard/${productToDelete.id_product}`, {
         method: "DELETE",
       })
       setProducts(products.filter((p) => p.id_product !== productToDelete.id_product))
       setIsDeleteDialogOpen(false)
       setProductToDelete(null)
-    } catch (err) {
-      console.error(err)
+    } catch (err) {     throw new Error("Erreur lors du chargement des commandes");
     }
   }
 

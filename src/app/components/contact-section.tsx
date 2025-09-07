@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import { Phone, Mail, MessageSquare, MessageCircle, Sparkles, Star } from "lucide-react"
 
 export function ContactSection() {
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 const [settings, setSettings] = useState({
     contact_phone: "",
     contact_whatsapp: "",
@@ -14,7 +14,7 @@ const [settings, setSettings] = useState({
     useEffect(() => {
       const fetchSettings = async () => {
         try {
-          const res = await fetch(`${API_BASE_URL}/setting`)
+          const res = await fetch(`${API_BASE_URL}/api/setting`)
           const data = await res.json()
           setSettings(data)
         } catch (err) {

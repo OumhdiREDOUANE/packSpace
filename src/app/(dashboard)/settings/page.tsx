@@ -17,16 +17,16 @@ export default function SettingsPage() {
   })
   const [loading, setLoading] = useState(true)
 
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/setting`)
+        const res = await fetch(`${API_BASE_URL}/api/setting`)
         const data = await res.json()
         setSettings(data)
       } catch (err) {
-        console.error(err)
+            throw new Error("Erreur lors du chargement des commandes");
       } finally {
         setLoading(false)
       }
@@ -37,7 +37,7 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     try {
-      const res = await fetch(`${API_BASE_URL}/setting/1`, {
+      const res = await fetch(`${API_BASE_URL}/api/setting/1`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(settings),
@@ -46,7 +46,7 @@ export default function SettingsPage() {
       setSettings(updated)
       alert("Settings saved successfully!")
     } catch (err) {
-      console.error(err)
+           throw new Error("Erreur lors du chargement des commandes");
       alert("Error saving settings")
     }
   }

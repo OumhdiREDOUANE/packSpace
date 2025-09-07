@@ -8,14 +8,7 @@ import PhotoSwipe from "photoswipe";
 import "photoswipe/style.css";
 
 import Image from "next/image";
-// const details = [
-//         { label: "Pelliculage", value: "-" },
-//         { label: "Vernis", value: "-" },
-//         { label: "Impression", value: "-" },
-//         { label: "Format", value: "-" },
-//         { label: "Papier", value: "-" },
-//         { label: "Quantité", value: "-" },
-//       ];
+
 
 
 export default function ProductGallery({ DetailsProprieter,images }) {
@@ -102,9 +95,7 @@ export default function ProductGallery({ DetailsProprieter,images }) {
             )}
           </tbody>
         </table>
-        <button className="mt-4 w-full hover:bg-[#006294] hover:text-[#C09200] bg-[#C09200] text-white py-3 rounded transition-colors">
-          TELECHARGER UN DEVIS
-        </button>
+       
       </div>
     </div>
 </>

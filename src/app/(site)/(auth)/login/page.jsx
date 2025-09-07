@@ -41,7 +41,7 @@ export default function LoginPage() {
       const response = await apiLogin(email, password);
 
       if (response.message && !response.user) {
-        setError(response.message);
+        setError("Erreur lors du chargement des commandes");
         setLoading(false);
         return;
       }
@@ -57,7 +57,7 @@ export default function LoginPage() {
         router.push("/");
       }
     } catch (err) {
-      console.error(err);
+      
       setError( "Une erreur inconnue est survenue.");
     } finally {
       setLoading(false);

@@ -23,11 +23,11 @@ const [cartCount,setCartCount] = useState(0);
 
   const router = useRouter();
   const { isLoggedIn, logout } = useAuth();
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   // Logout
   const handleLogout = async () => {
   try {
-    await request("/logout", { method: "POST", auth: true });
+    await request("/api/logout", { method: "POST", auth: true });
     // removeToken();  <-- supprime cette ligne
     Cookies.remove("session_id",{ path: "/" }); // supprime ton token ou session
 
@@ -60,13 +60,13 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/a
    let res;
 
   if (token) {
-    res = await fetch(`${API_BASE_URL}/count?session_user=${sessionId}`, {
+    res = await fetch(`${API_BASE_URL}/api/count?session_user=${sessionId}`, {
       cache: "no-store",
       credentials: "include",
       headers: { "Authorization": `Bearer ${token}` },
     });
   } else {
-    res = await fetch(`${API_BASE_URL}/count/notLogin?session_user=${sessionId}`, {
+    res = await fetch(`${API_BASE_URL}/api/count/notLogin?session_user=${sessionId}`, {
       cache: "no-store",
       credentials: "include",
     });
@@ -124,7 +124,7 @@ const interval = setInterval(() => {
   //         // انتهت الصلاحية → حذف الكوكيز
   //         Cookies.remove("session_id", { path: "/" });
   //         Cookies.remove("session_expiry", { path: "/" });
-  //         console.log("Session expired");
+  //        
   //         clearInterval(intervalId); // يمكن توقف التحقق بعد انتهاء session
   //       }
   //     }, 1000);
@@ -147,7 +147,7 @@ const interval = setInterval(() => {
 
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/product?search=${searchQuery}`);
+        const res = await fetch(`${API_BASE_URL}/api/product?search=${searchQuery}`);
         const data = await res.json();
         setSearchResults(data.data || []);
       } catch (err) {

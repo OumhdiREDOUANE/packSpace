@@ -28,7 +28,7 @@ export function CategoriesTable() {
   const [categoryToDelete, setCategoryToDelete] = useState<Category | null>(null)
 
   // تغيير الرابط عند النشر
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
   // جلب البيانات
   useEffect(() => {
@@ -39,12 +39,12 @@ export function CategoriesTable() {
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch(`${API_URL}/categoryDashboard`)
+      const res = await fetch(`${API_URL}/api/categoryDashboard`)
       if (!res.ok) throw new Error("Failed to fetch categories")
       const data = await res.json()
       setCategories(data.data || [])
     } catch (err: any) {
-      setError(err.message || "Something went wrong")
+      setError("Something went wrong")
     } finally {
       setLoading(false)
     }
@@ -81,8 +81,8 @@ export function CategoriesTable() {
 
   try {
     const url = selectedCategory
-      ? `${API_URL}/categoryDashboard/${selectedCategory.id_categorie}`
-      : `${API_URL}/categoryDashboard`;
+      ? `${API_URL}/api/categoryDashboard/${selectedCategory.id_categorie}`
+      : `${API_URL}/api/categoryDashboard`;
 
     const res = await fetch(url, {
       method: "POST",
@@ -94,7 +94,7 @@ export function CategoriesTable() {
     fetchCategories()
     setIsDialogOpen(false)
   } catch (err) {
-    console.error(err)
+     throw new Error("Erreur lors du chargement des commandes");
   }
 }
 
@@ -103,7 +103,7 @@ export function CategoriesTable() {
   const confirmDelete = async () => {
     if (categoryToDelete) {
       try {
-        const res = await fetch(`${API_URL}/categoryDashboard/${categoryToDelete.id_categorie}`, {
+        const res = await fetch(`${API_URL}/api/categoryDashboard/${categoryToDelete.id_categorie}`, {
           method: "DELETE",
         })
         if (!res.ok) throw new Error("Failed to delete category")
@@ -111,7 +111,7 @@ export function CategoriesTable() {
         setIsDeleteDialogOpen(false)
         setCategoryToDelete(null)
       } catch (err) {
-        console.error(err)
+             throw new Error("Erreur lors du chargement des commandes");
       }
     }
   }

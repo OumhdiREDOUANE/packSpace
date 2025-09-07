@@ -39,8 +39,8 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
       redirect("/login");
     }
   } catch (error) {
-    console.error("Error checking token:", error);
     redirect("/login");
+    throw new Error("Erreur lors du chargement des commandes");
   }
   return (
     <html lang="en" className="dark">

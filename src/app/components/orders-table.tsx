@@ -52,7 +52,7 @@ export function OrdersTable() {
         const res = await fetch(`${API_URL}/api/OrderDashboard`)
         if (!res.ok) throw new Error("Failed to fetch orders")
         const data = await res.json()
-      console.log(data)
+     
         const orders: Order[] = data.data.map((op: any) => ({
           id: op.id_orderProduct,
           name_product: op.product.name_product,
@@ -74,8 +74,8 @@ export function OrdersTable() {
         }))
         setOrders(orders)
       } catch (err: any) {
-        console.error(err)
-        setError(err.message || "Error fetching orders")
+        setError("Error fetching orders")
+       
       } finally {
         setLoading(false)
       }

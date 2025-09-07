@@ -42,30 +42,30 @@ export default function ProprietorOptionsPage() {
 
   const [filterProprietor, setFilterProprietor] = useState("all")
   const [filterProduct, setFilterProduct] = useState("all")
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
   // Fetch options from Laravel API
   const fetchOptions = async () => {
     try {
-      let url = `${API_URL}/optionDashboard?proprieter_id=${filterProprietor}&product_id=${filterProduct}`
+      let url = `${API_URL}/api/optionDashboard?proprieter_id=${filterProprietor}&product_id=${filterProduct}`
       const res = await fetch(url)
       const data = await res.json()
       setOptions(data)
     } catch (error) {
-      console.error("Error fetching options:", error)
+           throw new Error("Erreur lors du chargement des commandes");
     }
   }
 
   // Fetch proprietors and products for dropdowns
   const fetchFiltersData = async () => {
     try {
-      const res = await fetch(`${API_URL}/proprieterDashboard`)
+      const res = await fetch(`${API_URL}/api/proprieterDashboard`)
     const data = await res.json()
-    console.log(data)
+
     setProprietors(data.proprieters)
     setProducts(data.products)
     } catch (error) {
-      console.error("Error fetching filters data:", error)
+           throw new Error("Erreur lors du chargement des commandes");
     }
   }
 
@@ -102,8 +102,8 @@ export default function ProprietorOptionsPage() {
         if (selectedOption) optionData.append("_method", "PUT");
    try {
     const url = selectedOption
-      ? `${API_URL}/optionDashboard/${selectedOption.id_option}`
-      : `${API_URL}/optionDashboard`;
+      ? `${API_URL}/api/optionDashboard/${selectedOption.id_option}`
+      : `${API_URL}/api/optionDashboard`;
 
     const res = await fetch(url, {
       method: "POST",
@@ -115,19 +115,19 @@ export default function ProprietorOptionsPage() {
       setOptionDialogOpen(false)
       setSelectedOption(null)
     } catch (error) {
-      console.error("Error saving option:", error)
+          throw new Error("Erreur lors du chargement des commandes");
     }
   }
 
   const handleConfirmDelete = async () => {
     if (!selectedOption) return
     try {
-      await fetch(`${API_URL}/optionDashboard/${selectedOption.id_option}`, { method: "DELETE" })
+      await fetch(`${API_URL}/api/optionDashboard/${selectedOption.id_option}`, { method: "DELETE" })
       fetchOptions()
       setDeleteOptionDialogOpen(false)
       setSelectedOption(null)
     } catch (error) {
-      console.error("Error deleting option:", error)
+          throw new Error("Erreur lors du chargement des commandes");
     }
   }
 

@@ -23,9 +23,7 @@ const productsData = [
 ]
 
 export function DashboardCharts() {
-  console.log("[v0] DashboardCharts rendering")
-  console.log("[v0] ordersData:", ordersData)
-  console.log("[v0] productsData:", productsData)
+ 
 
   return (
     <div className="grid gap-4 md:grid-cols-2">

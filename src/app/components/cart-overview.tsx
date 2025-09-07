@@ -55,13 +55,13 @@ export function CartOverview() {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
 
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`)
+        if (!res.ok) throw new Error(`HTTP error!`)
 
         const data = await res.json()
         setCarts(data)
       } catch (err: any) {
-        console.error("Error fetching carts:", err)
-        setError(err.message || "Error fetching carts")
+        setError("Error fetching carts")
+        throw new Error("Erreur lors du chargement des commandes");
       } finally {
         setLoading(false)
       }
@@ -99,7 +99,7 @@ export function CartOverview() {
         prev.map((c) => (c.panier_id === cartId ? { ...c, status: newStatus } : c))
       )
     } catch (err) {
-      console.error("Error updating status:", err)
+         throw new Error("Erreur lors du chargement des commandes");
     }
   }
 

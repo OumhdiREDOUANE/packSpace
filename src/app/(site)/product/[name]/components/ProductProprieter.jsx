@@ -20,7 +20,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
     { label: "Prix Totale", value: null },
   ]);
 
-
+ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   // ---------------------------
   // Toggle Format
   // ---------------------------
@@ -156,7 +156,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
     
   };
   const handleSelectOption = (proprieterName, id_ProductOption) => {
-    console.log(dataPost)
+   
     setDataPost((prev) => ({
       ...prev,
       [proprieterName]: id_ProductOption, // نخزن id ديال option
@@ -167,8 +167,8 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
 
   if (hasMissing) return;
 
-    console.log(dataPost)
-    console.log(sessionId)
+    
+    
       
     try {
       const payload = {};
@@ -178,7 +178,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
     
        payload.prix_orderProduct = prixTotal
         // 🆕 Store
-      const  response = await fetch("http://127.0.0.1:8000/api/product", {
+      const  response = await fetch(`${API_BASE_URL}/api/product`, {
           method: "POST",
           headers: { 
             "Content-Type": "application/json",
@@ -189,18 +189,17 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
     
       if (!response.ok) {
         const text = await response.text();
-        console.error("Server error:", response.status,text);
-        return;
+           throw new Error("Erreur lors du chargement des commandes");
       }
     
       const data = await response.json();
-      console.log("Order saved:", data);
+   
      const text = await response.text(); // اقرأ نص الرد أولاً
-  console.log("Raw response:", text);
+  
       
     
     } catch (error) {
-      console.error("Error saving order:", error);
+     throw new Error("Erreur lors du chargement des commandes");
     }
     
   };

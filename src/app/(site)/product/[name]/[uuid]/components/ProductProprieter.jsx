@@ -21,6 +21,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
     { label: "Prix unitaire", value: null },
     { label: "Prix Totale", value: null },
   ]);
+   const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   useEffect(() => {
 
       setOrderData(JSON.parse(sessionStorage.getItem("orderData")))
@@ -177,7 +178,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
     
   };
   const handleSelectOption = (proprieterName, id_ProductOption) => {
-    console.log(dataPost)
+    
     setDataPost((prev) => ({
       ...prev,
       [proprieterName]: id_ProductOption, // نخزن id ديال option
@@ -198,7 +199,7 @@ e.preventDefault();
       // ✏️ Update
       const id_order = orderData.id_orderProduct;
 
-      response = await fetch(`http://127.0.0.1:8000/api/product/${id_order}`, {
+      response = await fetch(`${API_BASE_URL}/api/product/${id_order}`, {
         method: "PUT",
         headers: { 
           "Content-Type": "application/json",
@@ -210,18 +211,17 @@ e.preventDefault();
 
     if (!response.ok) {
       const text = await response.text();
-      console.error("Server error:", response.status, text);
-      return;
+          throw new Error("Erreur lors du chargement des commandes");
     }
 
     const data = await response.json();
-    console.log("Order saved:", data);
+   
 
     // ✅ التنقل فقط بعد نجاح الـ update
     router.push("/cartClient");
 
   } catch (error) {
-    console.error("Error saving order:", error);
+       throw new Error("Erreur lors du chargement des commandes");
   }
 };
 

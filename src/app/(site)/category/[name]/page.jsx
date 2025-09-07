@@ -1,8 +1,8 @@
 // app/category/page.tsx (أو أي ملف jsx/tsx حسب المسار)
 import Link from 'next/link';
 async function fetchProductsByCategory(name) {
-    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
-    const res = await fetch(`${API_BASE_URL}/categories/${name}`, {
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+    const res = await fetch(`${API_BASE_URL}/api/categories/${name}`, {
      next: { revalidate: 60 } // لإلغاء التخزين المؤقت أثناء التطوير، احذف أو غيّر حسب الحاجة
     });
   

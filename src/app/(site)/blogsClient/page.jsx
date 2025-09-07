@@ -4,9 +4,9 @@ import BlogPage from "./fetchDataBlogs";
 export default async function FetchDataBlogs() {
   
   let responseData = [];
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
  
-    const res = await fetch(`${API_BASE_URL}/blogs`, {
+    const res = await fetch(`${API_BASE_URL}/api/blogs`, {
       next: { revalidate: 60 },
     });
 

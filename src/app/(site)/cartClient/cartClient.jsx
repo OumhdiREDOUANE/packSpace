@@ -18,11 +18,11 @@ export default function CartClient({ sessionId, orders, token }) {
   const [dataOfOrders, setDataOfOrders] = useState(orders || []);
     const [loadingItems, setLoadingItems] = useState({});
   const router = useRouter();
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   const url = sessionId
     ? token
-      ? `${API_BASE_URL}/cart/${sessionId}`
-      : `${API_BASE_URL}/cart/notLogin/${sessionId}`
+      ? `${API_BASE_URL}/api/cart/${sessionId}`
+      : `${API_BASE_URL}/api/cart/notLogin/${sessionId}`
     : null;
 
   const { data } = useSWR(url, (url) => fetcher(url, token), {
@@ -42,7 +42,7 @@ export default function CartClient({ sessionId, orders, token }) {
   const handleDelete = async (id_orderProduct) => {
     try {
       const sessionId = Cookies.get("session_id");
-      const response = await fetch(`${API_BASE_URL}/cart/notLogin/${id_orderProduct}`, {
+      const response = await fetch(`${API_BASE_URL}/api/cart/notLogin/${id_orderProduct}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json", "X-Session-Id": sessionId },
       });
@@ -53,7 +53,7 @@ export default function CartClient({ sessionId, orders, token }) {
       }));
       mutate(url);
     } catch (error) {
-      
+           throw new Error("Erreur lors du chargement des commandes");
     }
   };
 
@@ -70,7 +70,7 @@ export default function CartClient({ sessionId, orders, token }) {
     }
     try {
       const sessionId = Cookies.get("session_id");
-      const response = await fetch(`${API_BASE_URL}/save/${id_orderProduct}`, {
+      const response = await fetch(`${API_BASE_URL}/api/save/${id_orderProduct}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function CartClient({ sessionId, orders, token }) {
       if (!response.ok) throw new Error("Erreur sauvegarde");
       mutate(url);
     } catch (error) {
-      
+           throw new Error("Erreur lors du chargement des commandes");
     }
   };
   const handleSubmit = async (id_orderProduct) => {
@@ -98,7 +98,7 @@ if (!order) return;
       payload.prix_orderProduct = order.prix_total
     
       const sessionId = Cookies.get("session_id");
-      const response = await fetch(`${API_BASE_URL}/product`, {
+      const response = await fetch(`${API_BASE_URL}/api/product`, {
         method: "POST",
         headers: { "Content-Type": "application/json",
           "X-Session-Id": sessionId,
@@ -120,7 +120,7 @@ if (!order) return;
       
       if (data.success === true) {
         
-        mutate(`${API_BASE_URL}/cart/notLogin/${sessionId}`);
+        mutate(`${API_BASE_URL}/api/cart/notLogin/${sessionId}`);
 
       setLoadingItems(prev => ({ ...prev, [id_orderProduct]: false })); // stop loading
     } 
@@ -146,7 +146,7 @@ const handleSuivre =  () => {
     }
     try {
       const sessionId = Cookies.get("session_id");
-      const response = await fetch(`${API_BASE_URL}/cart/valider-panier`, {
+      const response = await fetch(`${API_BASE_URL}/api/cart/valider-panier`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +158,7 @@ const handleSuivre =  () => {
       if (!response.ok) throw new Error("Erreur validation panier");
       mutate(url);
     } catch (error) {
-      
+           throw new Error("Erreur lors du chargement des commandes");
     }
   };
 

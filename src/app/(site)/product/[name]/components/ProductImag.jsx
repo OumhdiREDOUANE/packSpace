@@ -101,9 +101,7 @@ export default function ProductGallery({ DetailsProprieter,images }) {
             )}
           </tbody>
         </table>
-        <button className="mt-4 w-full hover:bg-[#006294] hover:text-[#C09200] bg-[#C09200] text-white py-3 rounded transition-colors">
-          TELECHARGER UN DEVIS
-        </button>
+      
       </div>
     </div>
 

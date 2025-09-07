@@ -45,13 +45,13 @@ export function ProductDialog({ product, open, onOpenChange, onSave }: ProductDi
     newImages: [] as File[],        // الصور الجديدة فقط
   existingImages: [] as string[]
   })
-
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   const [categories, setCategories] = useState<Category[]>([])
     const fileInputRef = useRef<HTMLInputElement>(null)
 
   // جلب لائحة الكاتيجوري من API
   useEffect(() => {
-    fetch("http://127.0.0.1:8000/api/categories")
+    fetch(`${API_URL}/api/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(data.data))
   }, [])

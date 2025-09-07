@@ -29,16 +29,16 @@ export function UsersTable() {
   const [loading, setLoading] = useState(true)
   const [currentPage, setCurrentPage] = useState(1)
   const [itemsPerPage] = useState(10)
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   // 🔹 Charger les utilisateurs depuis Laravel
  const fetchUsers = async () => {
     setLoading(true)
     try {
-      const res = await fetch(`${API_URL}/users`, { cache: "no-store" })
+      const res = await fetch(`${API_URL}/api/users`, { cache: "no-store" })
       const data = await res.json()
       setUsers(data.data || [])
     } catch (err) {
-      console.error("Erreur de chargement des utilisateurs:", err)
+           throw new Error("Erreur lors du chargement des commandes");
     } finally {
       setLoading(false)
     }
@@ -83,7 +83,7 @@ export function UsersTable() {
     try {
       if (selectedUser) {
         // Update
-        const res = await fetch(`${API_URL}/users/${selectedUser.id_user}`, {
+        const res = await fetch(`${API_URL}/api/users/${selectedUser.id_user}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(userData),
@@ -103,8 +103,8 @@ export function UsersTable() {
       }
       fetchUsers()
       setIsUserDialogOpen(false)
-    } catch (error) {
-      console.error("Erreur lors de la sauvegarde:", error)
+    } catch (error) {     
+      throw new Error("Erreur lors du chargement des commandes");
     }
   }
 
@@ -113,7 +113,7 @@ export function UsersTable() {
     if (!userToDelete) return
 
     try {
-      await fetch(`${API_URL}/users/${userToDelete.id_user}`, {
+      await fetch(`${API_URL}/api/users/${userToDelete.id_user}`, {
         method: "DELETE",
       })
       setUsers(users.filter((u) => u.id_user !== userToDelete.id_user))
@@ -121,7 +121,7 @@ export function UsersTable() {
       
       setUserToDelete(null)
     } catch (error) {
-      console.error("Erreur lors de la suppression:", error)
+           throw new Error("Erreur lors du chargement des commandes");
     }
   }
 

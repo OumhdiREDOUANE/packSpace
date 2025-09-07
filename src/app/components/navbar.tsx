@@ -51,10 +51,10 @@ export function Navbar({ onMenuClick }: NavbarProps) {
           const data = await res.json();
           setUser(data);
         } else {
-          console.error("Failed to fetch user");
+               throw new Error("Erreur lors du chargement des commandes");
         }
       } catch (error) {
-        console.error("Error fetching user:", error);
+             throw new Error("Erreur lors du chargement des commandes");
       }
     };
 
@@ -63,14 +63,14 @@ export function Navbar({ onMenuClick }: NavbarProps) {
 
   const handleLogout = async () => {
    try {
-     await request("/logout", { method: "POST", auth: true });
+     await request("/api/logout", { method: "POST", auth: true });
      // removeToken();  <-- supprime cette ligne
      Cookies.remove("session_id",{ path: "/" }); // supprime ton token ou session
  
      logout();
      router.push("/");
    } catch (e) {
-     console.error("Logout error:", e.message);
+         throw new Error("Erreur lors du chargement des commandes");
    }
  };
 

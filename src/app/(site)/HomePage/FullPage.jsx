@@ -4,9 +4,9 @@ import Home from './page';
 // Next.js Server Component أو Client Component حسب حاجتك
 export default async function FullPage() {
   // جلب البيانات من API
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
 
-  const res = await fetch(`${API_BASE_URL}/categories`, {
+  const res = await fetch(`${API_BASE_URL}/api/categories`, {
     next: { revalidate: 60 }, // إعادة التحقق كل 60 ثانية
   });
   const response = await res.json();
@@ -19,10 +19,10 @@ export default async function FullPage() {
     img: cat.url, // تأكد أن API ترجع image_categorie
 
   }));
-const resProducts = await fetch(`${API_BASE_URL}/product/topProducts`, {
+const resProducts = await fetch(`${API_BASE_URL}/api/product/topProducts`, {
     next: { revalidate: 60 },
   });
-  if (!resProducts.ok) throw new Error(`HTTP error! status: ${resProducts.status}`);
+  if (!resProducts.ok)      throw new Error("Erreur lors du chargement des commandes");
   const responseProducts = await resProducts.json();
 
   const topProducts = responseProducts.data.map((prod) => ({

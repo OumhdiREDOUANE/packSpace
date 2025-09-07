@@ -1,0 +1,75 @@
+# Query: console.
+# Including: ./frontend/src
+# ContextLines: 1
+
+18 results - 10 files
+
+frontend\src\app\(dashboard)\faq\page.tsx:
+  122      } catch (err) {
+  123:           throw new Error("Erreur lors du chargement des commandes");
+  124      } finally {
+
+  138      } catch (err) {
+  139:          throw new Error("Erreur lors du chargement des commandes");
+  140      } finally {
+
+frontend\src\app\(dashboard)\settings\page.tsx:
+  28        } catch (err) {
+  29:             throw new Error("Erreur lors du chargement des commandes");
+  30        } finally {
+
+  48      } catch (err) {
+  49:           throw new Error("Erreur lors du chargement des commandes");
+  50        alert("Error saving settings")
+
+frontend\src\app\(site)\component\Header.jsx:
+  126    //         Cookies.remove("session_expiry", { path: "/" });
+  127:   //         console.log("Session expired");
+  128    //         clearInterval(intervalId); // يمكن توقف التحقق بعد انتهاء session
+
+frontend\src\app\(site)\product\[name]\components\ProductProprieter.jsx:
+  158    const handleSelectOption = (proprieterName, id_ProductOption) => {
+  159:     
+  160      setDataPost((prev) => ({
+
+  169  
+  170:     
+  172        
+
+frontend\src\app\components\dashboard-charts.tsx:
+  25  export function DashboardCharts() {
+  26:  
+  29  
+
+frontend\src\app\components\navbar.tsx:
+  72     } catch (e) {
+  73:          throw new Error("Erreur lors du chargement des commandes");
+  74     }
+
+frontend\src\app\components\orders-table.tsx:
+  54          const data = await res.json()
+  55: 
+  56          const orders: Order[] = data.data.map((op: any) => ({
+
+  76        } catch (err: any) {
+  77:        
+  78          setError("Error fetching orders")
+
+frontend\src\app\components\products-table.tsx:
+  109      } catch (err) {
+  110:            throw new Error("Erreur lors du chargement des commandes");
+  111      }
+
+  128      } catch (err) {
+  129:           throw new Error("Erreur lors du chargement des commandes");
+  130      }
+
+frontend\src\app\components\users-table.tsx:
+  40      } catch (err) {
+  41:            throw new Error("Erreur lors du chargement des commandes");
+  42      } finally {
+
+frontend\src\app\lib\api.js:
+  44  //     error.responseText = text;
+  45: // // console.log(re.statuts,text)
+  46  //     throw error;
