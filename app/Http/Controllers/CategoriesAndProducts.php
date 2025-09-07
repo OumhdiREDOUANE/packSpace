@@ -82,11 +82,27 @@ public function topProducts()
      */
     public function show(string $name)
     {
-        $productsOfCategorie = Categorie::where('name_categorie', $name)
+        if ($name == "all") {
+        $products = Product::with('images')->get();
+      
+
+        return response()->json([
+            'data' => $products->map(function ($product) {
+                return [
+                    'id_product' => $product->id_product,
+                    'name_product' => $product->name_product,
+                    'description_product' => $product->description_product,
+                    'main_image' => $product->images->first()?->url,
+                ];
+            })
+        ]);
+
+    }else{
+            $productsOfCategorie = Categorie::where('name_categorie', $name)
         ->with('products.images')
         ->firstOrFail();
-   
-      return  ProductsOfCategorieResource::collection($productsOfCategorie->products);
+        return  ProductsOfCategorieResource::collection($productsOfCategorie->products);
+        }
         
     }
 
