@@ -215,6 +215,9 @@ export function CartOverview() {
                           <Button variant="ghost" size="sm" onClick={() => handleViewCart(cart)}>
                             <Eye className="h-4 w-4" />
                           </Button>
+                          {
+                            cart.role =='admin'&&(
+
                           <Select
                             value={cart.status}
                             onValueChange={(val) =>
@@ -231,6 +234,8 @@ export function CartOverview() {
                               <SelectItem value="Cancelled">Cancelled</SelectItem>
                             </SelectContent>
                           </Select>
+                            )
+                          }
                         </div>
                       </TableCell>
                     </TableRow>

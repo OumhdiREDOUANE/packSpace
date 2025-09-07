@@ -30,7 +30,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
     await request("/api/logout", { method: "POST", auth: true });
     // removeToken();  <-- supprime cette ligne
     Cookies.remove("session_id",{ path: "/" }); // supprime ton token ou session
-
+setCartCount(0)
     logout();
     router.push("/");
   } catch (e) {
@@ -82,9 +82,44 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
   
  setCartCount(data.countOfOrder)
  }
+  useEffect(() => {
+      setSession();
+  
+      const resetSessionTimer = () => {
+        if (Cookies.get("session_id")) {
+          const expiryTime = Date.now() + SESSION_TIMEOUT;
+          Cookies.set("session_expiry", expiryTime.toString(), { path: "/" });
+        }
+      };
+  
+      ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
+        window.addEventListener(evt, resetSessionTimer)
+      );
+  
+      const intervalId = setInterval(() => {
+        const expiry = parseInt(Cookies.get("session_expiry") || "0");
+        if (Date.now() > expiry) {
+          // انتهت الصلاحية → حذف الكوكيز
+          Cookies.remove("session_id", { path: "/" });
+          Cookies.remove("session_expiry", { path: "/" });
+         
+          clearInterval(intervalId); // يمكن توقف التحقق بعد انتهاء session
+        }
+      }, 1000);
+      
+   
+    return () => {
+      ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
+        window.removeEventListener(evt, resetSessionTimer)
+      );
+      clearInterval(intervalId);
+    };
+   }, []);
+
 useEffect(()=>{
   const sessionId = Cookies.get("session_id")
   const token = Cookies.get("token")
+
 if(sessionId){
   fetchCount(sessionId,token)
 }else{
@@ -104,38 +139,7 @@ const interval = setInterval(() => {
 
 },[])
 
-  // useEffect(() => {
-  //     setSession();
-  
-  //     const resetSessionTimer = () => {
-  //       if (Cookies.get("session_id")) {
-  //         const expiryTime = Date.now() + SESSION_TIMEOUT;
-  //         Cookies.set("session_expiry", expiryTime.toString(), { path: "/" });
-  //       }
-  //     };
-  
-  //     ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
-  //       window.addEventListener(evt, resetSessionTimer)
-  //     );
-  
-  //     const intervalId = setInterval(() => {
-  //       const expiry = parseInt(Cookies.get("session_expiry") || "0");
-  //       if (Date.now() > expiry) {
-  //         // انتهت الصلاحية → حذف الكوكيز
-  //         Cookies.remove("session_id", { path: "/" });
-  //         Cookies.remove("session_expiry", { path: "/" });
-  //        
-  //         clearInterval(intervalId); // يمكن توقف التحقق بعد انتهاء session
-  //       }
-  //     }, 1000);
-   
-  //   return () => {
-  //     ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
-  //       window.removeEventListener(evt, resetSessionTimer)
-  //     );
-  //     clearInterval(intervalId);
-  //   };
-  //  }, []);
+ 
   
 
   // ---------------- Search ----------------

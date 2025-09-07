@@ -1,50 +1,40 @@
+import ProductSection from "./components/AllSection";
+import { notFound } from "next/navigation";
 
-import ProductSection from "./components/AllSection"
+// helper function to fetch data
+async function fetchData(url, errorMessage) {
+  try {
+    const res = await fetch(url, { next: { revalidate: 60 } });
 
+    if (!res.ok) {
+      if (res.status === 404) notFound();
+      throw new Error(errorMessage);
+    }
 
+    return res.json();
+  } catch (error) {
+    throw new Error(`${errorMessage}`);
+  }
+}
 
 export default async function ProductPage({ params }) {
   const API_URL = process.env.API_URL || "http://127.0.0.1:8000";
-  const { name } = await params;
-let images;
-  let res;
-  try {
-    res = await fetch(`${API_URL}/api/product/${encodeURIComponent(name)}`, {
-      next: { revalidate: 60 },
-    });
-  } catch (error) {
-    throw new Error(`Impossible de joindre l'API`);
-  }
+  const { name } = params;
 
-  if (!res.ok) {
-    if (res.status === 404) {
-      notFound();
-    }
-    throw new Error(`Failed to fetch product`);
-  }
+  // fetch product
+  const product = await fetchData(
+    `${API_URL}/api/product/${name}`,
+    "Failed to fetch product"
+  );
 
-  const product = await res.json();
-if(product.id_product){
-  let reponse;
-  try {
-    reponse = await fetch(`${API_URL}/api/images/product/${product.id_product}`, {
-      next: { revalidate: 60 },
-    });
-  } catch (error) {
-    throw new Error(`Impossible de joindre l'API`);
+  // fetch images only if product exists
+  let images = [];
+  if (product?.id_product) {
+    images = await fetchData(
+      `${API_URL}/api/images/product/${product.id_product}`,
+      "Failed to fetch images"
+    );
   }
-
-  if (!reponse.ok) {
-    if (res.status === 404) {
-      notFound();
-    }
-    throw new Error(`Failed to fetch images`);
-  }
-
-   images = await reponse.json();
-}else{
-  images=[]
-}
 
   return <ProductSection product={product} images={images} />;
 }

@@ -16,12 +16,26 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
   const [economie, setEconomie] = useState(null);
   const [missingOptions, setMissingOptions] = useState([]);
   const [dataPost, setDataPost] = useState([]);
+  const [promo_code, setPromo_code] = useState(0);
   const [orderData, setOrderData] = useState('');
   const [DetailsState, setDetailsState] = useState([
     { label: "Prix unitaire", value: null },
     { label: "Prix Totale", value: null },
   ]);
    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+    useEffect(() => {
+         const fetchSettings = async () => {
+           try {
+             const res = await fetch(`${API_BASE_URL}/api/setting`)
+             const data = await res.json()
+             setPromo_code(data.promo_code)
+           } catch (err) {
+            throw new Error("Erreur lors du chargement des commandes");
+           } 
+         }
+     
+         fetchSettings()
+       }, [])
   useEffect(() => {
 
       setOrderData(JSON.parse(sessionStorage.getItem("orderData")))
@@ -133,10 +147,15 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
 
       setprixUnitaire(unitPrice);
       SetPrixTotal(totalPrice);
-
-      const newAncienPrix = totalPrice * 0.6;
-      setAncienPrix(newAncienPrix);
-      setEconomie(totalPrice - newAncienPrix);
+       if (promo_code > 0) {
+      setAncienPrix(totalPrice);
+      setEconomie(totalPrice * promo_code);
+      SetPrixTotal(totalPrice - (totalPrice * promo_code));
+    } else {
+      setAncienPrix(0);
+      setEconomie(0);
+    }
+  
     }
   }, [product, selectedFormats]);
 
@@ -305,7 +324,7 @@ e.preventDefault();
                     className="hidden"
                   />
                   <img
-                    src="https://api.weprint.ma/revendeurs_apiv2/public/storage/assets/picto/1748885230-683ddeeebde2f.png"
+                    src={option.image_option}
                     alt={option.name_option}
                     className="w-24 mb-2"
                   />
@@ -348,7 +367,7 @@ e.preventDefault();
 
         <button
           onClick={(e)=>{
-            handleAddToCart(e)
+        
             handleSubmit(e)
           }
         }

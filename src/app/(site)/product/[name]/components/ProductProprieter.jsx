@@ -8,13 +8,15 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
 
   
   const [selectedFormats, setSelectedFormats] = useState([]);
-  const [prixUnitaire, setprixUnitaire] = useState(null);
-  const [ancienPrix, setAncienPrix] = useState(null);
-  const [prixTotal, SetPrixTotal] = useState(null);
-  const [economie, setEconomie] = useState(null);
+  const [prixUnitaire, setprixUnitaire] = useState(0);
+  const [ancienPrix, setAncienPrix] = useState(0);
+  const [prixTotal, SetPrixTotal] = useState(0);
+  const [economie, setEconomie] = useState(0);
   const [missingOptions, setMissingOptions] = useState([]);
   const [dataPost, setDataPost] = useState([]);
+ const [promo_code, setPromo_code] = useState(0);
   const [orderData, setOrderData] = useState();
+
   const [DetailsState, setDetailsState] = useState([
     { label: "Prix unitaire", value: null },
     { label: "Prix Totale", value: null },
@@ -30,13 +32,26 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
       return { ...prev, [proprieterName]: value };
     });
   };
+  useEffect(() => {
+         const fetchSettings = async () => {
+           try {
+             const res = await fetch(`${API_BASE_URL}/api/setting`)
+             const data = await res.json()
+             setPromo_code(data.promo_code)
+           } catch (err) {
+            throw new Error("Erreur lors du chargement des commandes");
+           } 
+         }
+     
+         fetchSettings()
+       }, [])
 
    
  function  getSession() {
   
     const sessionId = Cookies.get("session_id");
     const expiry = parseInt(Cookies.get("session_expiry") || "0");
-  
+  console.log(sessionId)
     if (!sessionId || Date.now() > expiry) {
       // انتهت الصلاحية → نحذف ونجدد
       Cookies.remove("session_id");
@@ -89,16 +104,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
   
       setDetailsState([ ...proprieterDetails,...baseDetails]);
       onDetailsProprieterChange([ ...proprieterDetails,...baseDetails]);
-    } else if (pathname.includes(params.uuid||"")) {
-      const order = JSON.parse(orderData);
-      const proprieterDetails = order.product.proprieter.map((prop) => ({
-        label: prop.name_proprieter,
-        value: prop.options.name_option,
-      }));
-  
-      setDetailsState([ ...proprieterDetails,...baseDetails]);
-      onDetailsProprieterChange([ ...proprieterDetails,...baseDetails,]);
-    }
+    } 
     
   }, [product]);
 
@@ -111,10 +117,15 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
 
       setprixUnitaire(unitPrice);
       SetPrixTotal(totalPrice);
-
-      const newAncienPrix = totalPrice * 0.6;
-      setAncienPrix(newAncienPrix);
-      setEconomie(totalPrice - newAncienPrix);
+      if (promo_code > 0) {
+      setAncienPrix(totalPrice);
+      setEconomie(totalPrice * promo_code);
+      SetPrixTotal(totalPrice - (totalPrice * promo_code));
+    } else {
+      setAncienPrix(0);
+      setEconomie(0);
+    }
+  
     }
   }, [product, selectedFormats]);
 
@@ -193,8 +204,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
       }
     
       const data = await response.json();
-   
-     const text = await response.text(); // اقرأ نص الرد أولاً
+
   
       
     
@@ -283,7 +293,7 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
                     className="hidden"
                   />
                   <img
-                    src="https://api.weprint.ma/revendeurs_apiv2/public/storage/assets/picto/1748885230-683ddeeebde2f.png"
+                     src={option.image_option}
                     alt={option.name_option}
                     className="w-24 mb-2"
                   />
@@ -325,11 +335,8 @@ const FlyerFormat = ({ product, onDetailsProprieterChange }) => {
         </div>
 
         <button
-          onClick={(e)=>{
-            handleAddToCart(e)
-            
-          }
-        }
+         
+        
         type='submit'
         
           className="mt-4 w-full hover:bg-[#006294] hover:text-[#C09200] bg-[#C09200] text-[#FFFFFF] py-3 rounded transition-colors"

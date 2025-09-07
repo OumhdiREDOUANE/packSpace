@@ -46,7 +46,9 @@ export default async function CategoryPage({params}) {
                <div key={prod.id_product} className="w-full sm:w-1/2 md:w-1/4 px-2 mb-6">
         <div className="flex flex-col h-full bg-white  transition overflow-hidden">
               <img
-                src={prod.image_product[0].url_image}
+          src={name === "all" 
+        ? prod.main_image ?? '/placeholder.jpg' 
+        : prod.image_product?.[0]?.url_image ?? '/placeholder.jpg'}
                 alt={prod.name_product}
               className="w-full h-[225px] object-cover"
               placeholder="blur"

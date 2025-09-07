@@ -52,7 +52,7 @@ export default function LoginPage() {
       }
 
       if (response.user.role === "admin") {
-        router.push("/cartClient");
+        router.push("/home");
       } else {
         router.push("/");
       }

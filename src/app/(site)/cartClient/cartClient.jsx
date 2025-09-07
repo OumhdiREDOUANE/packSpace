@@ -170,13 +170,6 @@ const handleSuivre =  () => {
     );
   }
 
-  if (!dataOfOrders?.data?.length) {
-    return (
-      <div className="text-center py-20 text-gray-500">
-        <p>Aucun produit dans votre panier.</p>
-      </div>
-    );
-  }
 
   return (
     <div className="max-w-6xl mx-auto p-6">
@@ -184,60 +177,100 @@ const handleSuivre =  () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Produits */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow p-4 space-y-6">
-          {dataOfOrders.data.map(order => {
-            const product = order.product;
-            const isLoading = loadingItems[order.id_orderProduct] || false;
-            return (
-              <div key={order.id_orderProduct} className="flex flex-col md:flex-row gap-4 border-b pb-4">
-                <div className="w-28 h-28 flex-shrink-0">
-                  <img src={product.image?.url_image} alt={product.name_product} className="w-full h-full rounded-lg object-cover" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-start">
-                    <h2 className="text-lg font-semibold">{product.name_product}</h2>
-                    <button onClick={() => handleDelete(order.id_orderProduct)} className="text-[#006294] hover:text-[#C09200]  ">
-                      <Trash2 size={20} />
-                    </button>
-                  </div>
-                  <p className="text-sm text-gray-500">
-                    Quantité: {order.product.proprieter.find(p => p.name_proprieter === "Quantité")?.options.name_option ?? "-"}
-                  </p>
-                  <div className="mt-2">
-                    <p className="font-medium text-gray-800">{order.prix_total} Dhs HT</p>
-                  </div>
-                  <div className="flex gap-2 mt-3">
-                    <button onClick={() => handleEdit(order)} className="p-2 border rounded-lg hover:bg-gray-100"><Edit size={18} /></button>
-                 <button onClick={()=>{
-                       handleSubmit(order.id_orderProduct)
-                    }
-                     
-                    } className="p-2 border rounded-lg hover:bg-gray-100">{isLoading ? (
+  {
+    (!dataOfOrders?.data?.length) ? (
+      <div className="text-center py-20 text-gray-500">
+        <p>Aucun produit dans votre panier.</p>
+      </div>
+    ) : (
+      dataOfOrders.data.map(order => {
+        const product = order.product;
+        const isLoading = loadingItems[order.id_orderProduct] || false;
+
+        return (
+          <div key={order.id_orderProduct} className="flex flex-col md:flex-row gap-4 border-b pb-4">
+            <div className="w-28 h-28 flex-shrink-0">
+              <img
+                src={product.image?.url_image}
+                alt={product.name_product}
+                className="w-full h-full rounded-lg object-cover"
+              />
+            </div>
+
+            <div className="flex-1">
+              <div className="flex justify-between items-start">
+                <h2 className="text-lg font-semibold">{product.name_product}</h2>
+                <button
+                  onClick={() => handleDelete(order.id_orderProduct)}
+                  className="text-[#006294] hover:text-[#C09200]"
+                >
+                  <Trash2 size={20} />
+                </button>
+              </div>
+
+              <p className="text-sm text-gray-500">
+                Quantité: {order.product.proprieter.find(p => p.name_proprieter === "Quantité")?.options.name_option ?? "-"}
+              </p>
+
+              <div className="mt-2">
+                <p className="font-medium text-gray-800">{order.prix_total} Dhs HT</p>
+              </div>
+
+              <div className="flex gap-2 mt-3">
+                <button onClick={() => handleEdit(order)} className="p-2 border rounded-lg hover:bg-gray-100">
+                  <Edit size={18} />
+                </button>
+
+                <button
+                  onClick={() => handleSubmit(order.id_orderProduct)}
+                  className="p-2 border rounded-lg hover:bg-gray-100"
+                >
+                  {isLoading ? (
                     <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-[#006294] border-b-2"></div>
                   ) : (
                     <Copy size={18} />
-                  )}</button>
-                    <button onClick={() => handleSave(order.id_orderProduct)} className="p-2 border rounded-lg hover:bg-gray-100"><Save size={18} /></button>
-                    <button className="p-2 border rounded-lg hover:bg-gray-100"><Download size={18} /></button>
-                  </div>
-                  <div className="mt-4">
-                    <button className="text-sm text-gray-600 hover:underline" onClick={() => setShowDetails(prev => ({ ...prev, [order.id_orderProduct]: !prev[order.id_orderProduct] }))}>
-                      {showDetails[order.id_orderProduct] ? "Masquer les détails ▲" : "Détails ▼"}
-                    </button>
-                    {showDetails[order.id_orderProduct] && (
-                      <ul className="mt-2 text-sm text-gray-600 space-y-1 pl-4 list-disc">
-                        {product.proprieter.map(p => (
-                          <li key={p.id_proprieter}>
-                            <span className="font-medium">{p.name_proprieter}:</span> {p.options.name_option}
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                </div>
+                  )}
+                </button>
+
+                <button
+                  onClick={() => handleSave(order.id_orderProduct)}
+                  className="p-2 border rounded-lg hover:bg-gray-100"
+                >
+                  <Save size={18} />
+                </button>
               </div>
-            );
-          })}
-        </div>
+
+              <div className="mt-4">
+                <button
+                  className="text-sm text-gray-600 hover:underline"
+                  onClick={() =>
+                    setShowDetails(prev => ({
+                      ...prev,
+                      [order.id_orderProduct]: !prev[order.id_orderProduct],
+                    }))
+                  }
+                >
+                  {showDetails[order.id_orderProduct] ? "Masquer les détails ▲" : "Détails ▼"}
+                </button>
+
+                {showDetails[order.id_orderProduct] && (
+                  <ul className="mt-2 text-sm text-gray-600 space-y-1 pl-4 list-disc">
+                    {product.proprieter.map(p => (
+                      <li key={p.id_proprieter}>
+                        <span className="font-medium">{p.name_proprieter}:</span> {p.options.name_option}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })
+    )
+  }
+</div>
+
 
         {/* Résumé */}
         <div className="bg-white rounded-2xl shadow p-4 h-fit">
@@ -252,9 +285,9 @@ const handleSuivre =  () => {
             </div>
           </div>
           <div className="mt-4 flex flex-col gap-3">
-            <button onClick={() => handleValidation(dataOfOrders.data.reduce((sum, o) => sum + o.prix_total, 0))} className="w-full bg-[#006294] hover:bg-[#C09200] text-white py-2 rounded-lg font-semibold">Valider mon panier</button>
+            <button onClick={() => handleValidation(dataOfOrders.data.reduce((sum, o) => sum + o.prix_total, 0))} className="w-full bg-[#006294] hover:bg-[#C09200] text-white py-2 rounded-lg font-semibold " disabled={!dataOfOrders?.data?.length}>Valider mon panier</button>
             <button onClick={() =>handleSuivre()} className="w-full border py-2 rounded-lg bg-[#006294] hover:bg-[#C09200] text-white">Poursuivre mes achats</button>
-            <button className="w-full bg-[#006294] hover:bg-[#C09200] text-white py-2 rounded-lg font-semibold">Télécharger un devis</button>
+          
           </div>
         </div>
       </div>
