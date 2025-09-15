@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Search, Plus, Loader2 } from "lucide-react"
+import { Card, CardContent } from "@/components/ui/card"
+
 import type { Proprietor } from "@/types/proprietor"
 
 interface Product {
@@ -106,6 +108,7 @@ export default function ProprietorsPage() {
 
   return (
     <DashboardLayout>
+       <Card className="p-6">
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -154,6 +157,7 @@ export default function ProprietorsPage() {
           />
         
       </div>
+      </Card>
 
       {/* Dialogs */}
       <ProprietorDialog

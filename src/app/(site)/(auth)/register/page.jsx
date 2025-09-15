@@ -31,7 +31,7 @@ export default function RegisterPage() {
       setMsg(message);
       setTimeout(() => router.push("/login"), 2000);
     } catch (err) {
-      setError( "Une erreur est survenue.");
+      setError("Une erreur est survenue.");
     } finally {
       setLoading(false);
     }
@@ -46,16 +46,16 @@ export default function RegisterPage() {
   ];
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-100 p-4 font-inter">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-lg p-8 sm:p-10">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <h2 className="text-2xl font-semibold mb-6 text-center font-inter">
           Créer un compte
         </h2>
 
         <form onSubmit={onSubmit} className="space-y-5">
           {fields.map((field) => (
             <div key={field.name}>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium mb-1 font-inter">
                 {field.label}
               </label>
               <input
@@ -64,18 +64,18 @@ export default function RegisterPage() {
                 value={form[field.name]}
                 onChange={onChange}
                 required
-                className="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:ring-2 focus:ring-[#C09200] text-[#6071e5] focus:outline-none transition"
+                className="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:ring-2 focus:outline-none font-inter font-medium"
               />
             </div>
           ))}
 
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-xl text-sm text-center">
+            <div className="p-3 rounded-xl text-sm text-center font-inter font-normal">
               {error}
             </div>
           )}
           {msg && (
-            <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm text-center">
+            <div className="p-3 rounded-xl text-sm text-center font-inter font-normal">
               {msg}
             </div>
           )}
@@ -83,11 +83,11 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-2xl bg-[#006294] hover:bg-[#C09200] text-white font-semibold text-lg transition flex items-center justify-center disabled:opacity-50"
+            className="w-full py-3 rounded-2xl font-inter font-semibold text-lg flex items-center justify-center disabled:opacity-50"
           >
-            {loading ? (
+            {loading && (
               <svg
-                className="animate-spin h-5 w-5 text-white mr-2"
+                className="animate-spin h-5 w-5 mr-2"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -106,16 +106,16 @@ export default function RegisterPage() {
                   d="M4 12a8 8 0 018-8v8H4z"
                 ></path>
               </svg>
-            ) : null}
+            )}
             {loading ? "Inscription..." : "S'inscrire"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm mt-4 font-inter font-normal">
           Vous avez déjà un compte ?{" "}
           <span
             onClick={() => router.push("/login")}
-            className="text-[#6071e5] font-medium cursor-pointer hover:underline"
+            className="font-inter font-medium cursor-pointer"
           >
             Connectez-vous
           </span>

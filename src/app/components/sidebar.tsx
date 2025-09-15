@@ -13,6 +13,8 @@ import {
   X,
   Tags,
   User,
+
+Group,
   Settings,
   FileText,
   HelpCircle,
@@ -31,8 +33,9 @@ interface SidebarProps {
 const navigation = [
   { name: "Dashboard", href: "/home", icon: BarChart3 },
   { name: "Users", href: "/users", icon: Users },
-  { name: "Products", href: "/products", icon: Package },
   { name: "Categories", href: "/categories", icon: Tags },
+  { name: "Groups", href: "/groups", icon: Group },
+  { name: "Products", href: "/products", icon: Package },
   { name: "Orders", href: "/orders", icon: ClipboardList },
    { name: "Cart", href: "/cart", icon: ShoppingCart },
   { name: "Proprietors", href: "/proprietors", icon: UserCheck },
@@ -62,18 +65,14 @@ export function Sidebar({ isOpen, onClose, onToggle, isCollapsed = false }: Side
         <div className="flex h-full flex-col">
           {/* Header */}
           <div className="flex h-16 items-center justify-between px-6 border-b border-sidebar-border">
-            {!isCollapsed && <h2 className="text-lg font-semibold text-sidebar-foreground">PackSpace</h2>}
-            {isCollapsed && (
-              <div className="w-8 h-8 bg-sidebar-primary rounded flex items-center justify-center">
-                <Package className="h-4 w-4 text-sidebar-primary-foreground" />
-              </div>
-            )}
+            {!isCollapsed && <h2 className="text-lg font-semibold  text-sidebar-foreground">PackSpace</h2>}
+            
             <div className="flex items-center gap-2">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={onToggle}
-                className="hidden lg:flex text-sidebar-foreground hover:bg-sidebar-accent"
+                className="hidden lg:flex text-sidebar-foreground  hover:bg-sidebar-accent"
               >
                 <Menu className="h-4 w-4" />
               </Button>

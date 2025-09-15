@@ -80,6 +80,7 @@ export default function CartClient({ sessionId, orders, token }) {
       });
       if (!response.ok) throw new Error("Erreur sauvegarde");
       mutate(url);
+      toast.success("Produit sauvegardé avec succès !")
     } catch (error) {
            throw new Error("Erreur lors du chargement des commandes");
     }
@@ -157,6 +158,7 @@ const handleSuivre =  () => {
       });
       if (!response.ok) throw new Error("Erreur validation panier");
       mutate(url);
+      toast.success("Panier validé avec succès !")
     } catch (error) {
            throw new Error("Erreur lors du chargement des commandes");
     }

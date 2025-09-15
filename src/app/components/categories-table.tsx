@@ -173,14 +173,19 @@ export function CategoriesTable() {
                           {category.products_count}
                         </div>
                       </TableCell>
-                      <TableCell className="text-right flex justify-end gap-2">
-                        <Button variant="ghost" size="sm" onClick={() => handleEditCategory(category)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button variant="ghost" size="sm" onClick={() => handleDeleteCategory(category)}>
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </TableCell>
+                   <TableCell >
+                    <div className="flex justify-center items-center gap-2 ">
+                      <Button variant="ghost" size="sm" onClick={() => handleEditCategory(category)}>
+      <Edit className="h-4 w-4" />
+    </Button>
+    <Button variant="ghost" size="sm" onClick={() => handleDeleteCategory(category)}>
+      <Trash2 className="h-4 w-4 text-red-500" />
+    </Button>
+                    </div>
+
+    
+</TableCell>
+
                     </TableRow>
                   ))}
                 </TableBody>

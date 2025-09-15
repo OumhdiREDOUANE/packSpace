@@ -98,7 +98,7 @@ export default function SettingsPage() {
                 />
               </div>
               <div className="space-y-2">
-                <Label>Promo Code</Label>
+                <Label>Prix Promo (Dicimal)</Label>
                 <Input
                   value={settings.promo_code}
                   onChange={(e) => setSettings({ ...settings, promo_code: e.target.value })}

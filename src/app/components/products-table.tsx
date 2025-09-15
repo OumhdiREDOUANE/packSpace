@@ -16,6 +16,8 @@ interface Product {
   description_product: string
   categorie: string
   categorie_id: number
+  group_id?: number
+  group?:string
   images: { id_image: number; url_image: string }[]
 }
 
@@ -42,6 +44,7 @@ export function ProductsTable() {
       if (!res.ok) throw new Error("Failed to fetch products")
       const data = await res.json()
       setProducts(data.data)
+      
     } catch (err: any) {
       setError(err.message)
     } finally {
@@ -83,6 +86,11 @@ export function ProductsTable() {
     formDataToSend.append("name_product", formDataData.name_product)
     formDataToSend.append("description_product", formDataData.description_product)
     formDataToSend.append("categorie_id", formDataData.categorie_id)
+if (formDataData.group_id !== null) {
+  formDataToSend.append("group_id", formDataData.group_id)
+} else {
+  formDataToSend.append("group_id", "") // or skip it depending on backend
+}
 
     formDataData.existingImages.forEach((url: string) => {
       formDataToSend.append("existing_images[]", url)
@@ -184,8 +192,12 @@ export function ProductsTable() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Product</TableHead>
+                  <TableHead>Name Product</TableHead>
+                  
+
                   <TableHead>Category</TableHead>
+                  <TableHead>Group of Categroy</TableHead>
+
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -210,6 +222,8 @@ export function ProductsTable() {
           </div>
         </TableCell>
         <TableCell>{product.categorie}</TableCell>
+        <TableCell>{product.group??"not belongs any group"}</TableCell>
+
         <TableCell className="text-right">
           <Button variant="ghost" size="sm" onClick={() => handleEditProduct(product)}>
             <Edit className="h-4 w-4" />

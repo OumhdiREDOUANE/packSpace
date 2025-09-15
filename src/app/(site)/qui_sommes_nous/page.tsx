@@ -102,7 +102,7 @@ export default function QuiSommesNous() {
           />
         </div>
 
-        <div className="container mx-auto max-w-6xl relative z-10">
+        <div className="container mx-auto max-w-6xl relative z-6">
           <div className="flex flex-col items-center justify-center text-center space-y-6 lg:space-y-8">
             <div className="space-y-2">
               <h1 className="text-4xl sm:text-5xl font-bold leading-tight text-white lg:text-6xl animate-in slide-in-from-bottom duration-1000">

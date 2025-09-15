@@ -133,6 +133,7 @@ export default function ProprietorOptionsPage() {
 
   return (
     <DashboardLayout>
+      <Card className="p-6">
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-3xl font-bold">Proprietor Options</h1>
@@ -186,7 +187,7 @@ export default function ProprietorOptionsPage() {
         {/* Options Table */}
         <OptionDashboardTable options={filteredOptions} onEdit={handleEditOption} onDelete={handleDeleteOption} />
       </div>
-
+</Card>
       <ProprietorOptionDialog
         open={optionDialogOpen}
         onOpenChange={setOptionDialogOpen}

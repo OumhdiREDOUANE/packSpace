@@ -18,16 +18,15 @@ export default function LoginPage() {
   const [error, setError] = useState(null);
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
   useEffect(() => {
     if (verifyUrl) {
-      const backendUrl = API_BASE_URL + verifyUrl;
-      fetch(backendUrl, { method: "GET", credentials: "include" })
+      fetch(`${API_BASE_URL}${verifyUrl}`, { method: "GET", credentials: "include" })
         .then((res) => res.json())
         .then((data) => {
           alert(data.message || "Votre e-mail a été vérifié avec succès !");
-        })
-     
+        });
     }
   }, [verifyUrl]);
 
@@ -51,23 +50,18 @@ export default function LoginPage() {
         login(response.token);
       }
 
-      if (response.user.role === "admin") {
-        router.push("/home");
-      } else {
-        router.push("/");
-      }
+      router.push(response.user.role === "admin" ? "/home" : "/");
     } catch (err) {
-      
-      setError( "Une erreur inconnue est survenue.");
+      setError("Une erreur inconnue est survenue.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-100 p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-blue-100 to-purple-100 p-4 font-inter">
       <div className="w-full max-w-md bg-white rounded-3xl shadow-lg p-8 sm:p-10">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <h2 className="text-2xl font-semibold text-gray-800 mb-6 text-center">
           Connexion
         </h2>
 
@@ -82,7 +76,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:ring-2 focus:ring-[#C09200] text-[#6071e5] focus:outline-none transition"
+              className="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:ring-2 focus:ring-[#C09200] text-gray-700 placeholder-gray-400 font-medium focus:outline-none transition"
             />
           </div>
 
@@ -96,13 +90,13 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:ring-2 focus:ring-[#C09200] text-[#6071e5] focus:outline-none transition"
+              className="w-full px-4 py-3 rounded-2xl border border-gray-300 focus:ring-2 focus:ring-[#C09200] text-gray-700 placeholder-gray-400 font-medium focus:outline-none transition"
             />
           </div>
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 text-red-700 p-3 rounded-xl text-sm text-center">
+            <div className="bg-red-50 text-red-700 p-3 rounded-xl text-sm text-center font-normal">
               {error}
               {error.includes("activer votre e-mail") && (
                 <button
@@ -110,14 +104,12 @@ export default function LoginPage() {
                   onClick={async () => {
                     try {
                       await resendVerificationEmail();
-                      setInfo(
-                        "Un e-mail de vérification a été renvoyé sur votre boîte."
-                      );
+                      setInfo("Un e-mail de vérification a été renvoyé sur votre boîte.");
                     } catch (e) {
                       setError(e.message);
                     }
                   }}
-                  className="underline block mt-2 text-blue-600 hover:text-blue-800"
+                  className="underline block mt-2 text-blue-600 hover:text-blue-800 font-medium"
                 >
                   Renvoyer le lien de vérification
                 </button>
@@ -127,7 +119,7 @@ export default function LoginPage() {
 
           {/* Info */}
           {info && (
-            <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm text-center">
+            <div className="bg-green-50 text-green-700 p-3 rounded-xl text-sm text-center font-normal">
               {info}
             </div>
           )}
@@ -164,7 +156,7 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center text-sm text-gray-500 mt-4 font-normal">
           Pas de compte ?{" "}
           <Link
             href="/register"

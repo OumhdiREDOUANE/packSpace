@@ -36,6 +36,7 @@ export function UsersTable() {
     try {
       const res = await fetch(`${API_URL}/api/users`, { cache: "no-store" })
       const data = await res.json()
+      
       setUsers(data.data || [])
     } catch (err) {
            throw new Error("Erreur lors du chargement des commandes");
@@ -92,12 +93,13 @@ export function UsersTable() {
         
       } else {
         // Create
-        const res = await fetch(`${API_URL}/users`, {
+        const res = await fetch(`${API_URL}/api/users`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(userData),
         })
         const message = await res.json()
+       
       
         
       }

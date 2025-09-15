@@ -3,18 +3,17 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Search, User, LogOut, ShoppingCart, Menu, X } from "lucide-react";
+import { Search, CircleUserRound, LogOut, ShoppingCart, Menu, X } from "lucide-react";
 import NavBar from "./Navbar";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { request, removeToken } from "src/app/lib/api";
+import { request } from "src/app/lib/api";
 import { useAuth } from "src/app/components/AuthProvider";
 
 export default function Header({ navItems }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-
-const [cartCount,setCartCount] = useState(0);
+  const [cartCount, setCartCount] = useState(0);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -23,124 +22,19 @@ const [cartCount,setCartCount] = useState(0);
 
   const router = useRouter();
   const { isLoggedIn, logout } = useAuth();
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000"
-  // Logout
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000";
+
   const handleLogout = async () => {
-  try {
-    await request("/api/logout", { method: "POST", auth: true });
-    // removeToken();  <-- supprime cette ligne
-    Cookies.remove("session_id",{ path: "/" }); // supprime ton token ou session
-setCartCount(0)
-    logout();
-    router.push("/");
-  } catch (e) {
-     throw new Error("Erreur lors du chargement des commandes");
-  }
-};
- function generateSessionId() {
-      return crypto.randomUUID(); // ولا أي مولد UUID
+    try {
+      await request("/api/logout", { method: "POST", auth: true });
+      Cookies.remove("session_id", { path: "/" });
+      setCartCount(0);
+      logout();
+      router.push("/");
+    } catch (e) {
+      throw new Error("Erreur lors du chargement des commandes");
     }
-    
-    // مدة صلاحية بالميلي ثانية (مثلا 15 دقيقة)
-    const SESSION_TIMEOUT = 20 * 60 * 1000; 
-    
-    function setSession() {
-      const sessionId = Cookies.get("session_id") || generateSessionId();
-      const expiryTime = Date.now() + SESSION_TIMEOUT;
-    
-      Cookies.set("session_id", sessionId, { path: "/" });
-      Cookies.set("session_expiry", expiryTime.toString(), { path: "/" });
-    }
-    
-    // استرجاع session إلا مازال صالح
- 
-    
-    // كلما المستخدم دار أي حركة (click / scroll / keypress) نجدد الوقت
- const  fetchCount= async (sessionId,token)=>{
-   let res;
-
-  if (token) {
-    res = await fetch(`${API_BASE_URL}/api/count?session_user=${sessionId}`, {
-      cache: "no-store",
-      credentials: "include",
-      headers: { "Authorization": `Bearer ${token}` },
-    });
-  } else {
-    res = await fetch(`${API_BASE_URL}/api/count/notLogin?session_user=${sessionId}`, {
-      cache: "no-store",
-      credentials: "include",
-    });
-  }
-
-  if (!res.ok) {
-    const text = await res.text();
-  
-    throw new Error("Erreur lors du chargement des commandes");
-  }
-
-  const data = await res.json();
-  
- setCartCount(data.countOfOrder)
- }
-  useEffect(() => {
-      setSession();
-  
-      const resetSessionTimer = () => {
-        if (Cookies.get("session_id")) {
-          const expiryTime = Date.now() + SESSION_TIMEOUT;
-          Cookies.set("session_expiry", expiryTime.toString(), { path: "/" });
-        }
-      };
-  
-      ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
-        window.addEventListener(evt, resetSessionTimer)
-      );
-  
-      const intervalId = setInterval(() => {
-        const expiry = parseInt(Cookies.get("session_expiry") || "0");
-        if (Date.now() > expiry) {
-          // انتهت الصلاحية → حذف الكوكيز
-          Cookies.remove("session_id", { path: "/" });
-          Cookies.remove("session_expiry", { path: "/" });
-         
-          clearInterval(intervalId); // يمكن توقف التحقق بعد انتهاء session
-        }
-      }, 1000);
-      
-   
-    return () => {
-      ["click", "keypress", "mousemove", "scroll"].forEach(evt =>
-        window.removeEventListener(evt, resetSessionTimer)
-      );
-      clearInterval(intervalId);
-    };
-   }, []);
-
-useEffect(()=>{
-  const sessionId = Cookies.get("session_id")
-  const token = Cookies.get("token")
-
-if(sessionId){
-  fetchCount(sessionId,token)
-}else{
-   setCartCount(0)
-}
-const interval = setInterval(() => {
-
-      if (sessionId) {
-        fetchCount(sessionId, token)
-      }else{
-   setCartCount(0)
-}
-    }, 3000)
-
-    // تنظيف عند تفكيك الـ component
-    return () => clearInterval(interval)
-
-},[])
-
- 
-  
+  };
 
   // ---------------- Search ----------------
   useEffect(() => {
@@ -155,14 +49,13 @@ const interval = setInterval(() => {
         const data = await res.json();
         setSearchResults(data.data || []);
       } catch (err) {
-         throw new Error("Erreur lors du chargement des commandes");
+        throw new Error("Erreur lors du chargement des commandes");
       }
     }, 300);
 
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
-  // ---------------- Click Outside ----------------
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (
@@ -178,75 +71,79 @@ const interval = setInterval(() => {
 
   return (
     <>
-      <header className="bg-white px-4 py-3 sticky top-0 z-50 font-sans font-bold text-lg text-[#006294]">
+      <header className="bg-white px-4 py-3 sticky top-0 z-50 font-inter">
         <div className="max-w-7xl mx-auto">
 
           {/* Desktop */}
-          <div className="hidden md:flex items-center justify-between gap-4">
+          <div className="hidden md:flex items-end mb-5 justify-between gap-4">
             <div className="flex-shrink-0">
-              <Image src="/LOGO BLUE.png" alt="Logo" width={120} height={40} unoptimized className="h-10 w-auto" />
+              <Image src="/LOGO BLUE.png" alt="Logo" width={180} height={60} unoptimized />
             </div>
 
             {/* Search */}
-            <div ref={desktopSearchRef} className="flex-1 max-w-2xl mx-8 relative">
+            <div ref={desktopSearchRef} className="flex-1 max-w-lg mx-8 relative">
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Search className="h-5 w-5 text-[#006294]" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Recherche"
+                  placeholder="Que Cherchez-Vous ?"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-[#006294] rounded-lg bg-white placeholder-[#C09200] focus:outline-none focus:ring-2 focus:ring-[#006294] text-base text-[#006294]"
+                  className="block w-full pl-10 pr-3 py-2.5 h-6 bg-[#e6f0f6] font-medium rounded-lg placeholder-[#006294] focus:outline-none focus:ring-2 focus:ring-[#006294] text-sm text-[#006294]"
                 />
               </div>
 
-             {searchResults.length > 0 ? (
-  <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] max-h-60 overflow-y-auto">
-    <div className="py-2">
-      <div className="px-4 text-sm font-semibold text-gray-500">Produits</div>
-      {searchResults.map((product) => (
-        <Link
-          key={product.id_product}
-          href={`/product/${product.name_product}`}
-          className="block px-4 py-2 text-gray-700 hover:bg-[#F2FAFD] hover:text-[#006294] transition-colors duration-150"
-        onClick={() => setSearchQuery("")}
-        >
-          {product.name_product}
-        </Link>
-      ))}
-    </div>
-  </div>
-) : (
-  searchQuery.trim() !== "" && (
-    <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg  z-[9999] px-4 py-2 text-gray-500">
-      Aucun résultat trouvé
-    </div>
-  )
-)}
-
+              {searchResults.length > 0 ? (
+                <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] max-h-60 overflow-y-auto">
+                  <div className="py-2">
+                    <div className="px-4 text-sm font-semibold text-gray-500">Produits</div>
+                    {searchResults.map((product) => (
+                      <Link
+                        key={product.id_product}
+                        href={`/product/${product.name_product}`}
+                        className="block px-4 py-2 text-gray-700 hover:bg-[#F2FAFD] hover:text-[#006294] transition-colors duration-150 font-medium"
+                        onClick={() => setSearchQuery("")}
+                      >
+                        {product.name_product}
+                      </Link>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                searchQuery.trim() !== "" && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-[9999] px-4 py-2 text-gray-500 text-sm font-normal">
+                    Aucun résultat trouvé
+                  </div>
+                )
+              )}
             </div>
 
             {/* Right Icons */}
-            <div className="flex items-center space-x-4">
-              {!isLoggedIn ? (
-                <Link href="/login" className="p-2 text-[#006294] bg-[#f4f9fb] hover:bg-[#e6f0f6] rounded-lg flex items-center">
-                  <User className="h-5 w-5" />
-                </Link>
-              ) : (
-                <button onClick={handleLogout} className="p-2 text-[#006294] bg-[#f4f9fb] hover:bg-[#e6f0f6] rounded-lg">
-                  <LogOut className="h-5 w-5" />
-                </button>
-              )}
-              <Link href="/cartClient" className="relative p-2 text-[#006294] bg-[#f4f9fb] hover:bg-[#e6f0f6] rounded-lg flex items-center">
-                <ShoppingCart className="h-5 w-5" />
-                {cartCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#C09200] text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white">
-                    {cartCount}
-                  </span>
-                )}
+            <div className="flex items-center space-x-2">
+              <Link href="/cartClient" className="relative p-2 bg-[#006294] rounded-full flex items-center">
+                <img src="/delivery.png" className="h-6 w-6" />
               </Link>
+              <div className="flex space-x-2">
+                {!isLoggedIn ? (
+                  <Link href="/login" className="p-2 text-[#006294] hover:bg-[#e6f0f6] rounded-lg flex items-end">
+                    <CircleUserRound className="h-6 w-6" />
+                  </Link>
+                ) : (
+                  <button onClick={handleLogout} className="p-2 text-[#006294] hover:bg-[#e6f0f6] rounded-lg">
+                    <LogOut className="h-6 w-6" />
+                  </button>
+                )}
+                <Link href="/cartClient" className="relative p-2 text-[#006294] hover:bg-[#e6f0f6] rounded-lg flex items-end">
+                  <ShoppingCart className="h-6 w-6" />
+                  {cartCount == 0 && (
+                    <span className="bg-[#006294] text-white text-xs ml-2 font-bold rounded-sm h-8 w-8 flex items-center justify-center border-2 border-white">
+                      {1}
+                    </span>
+                  )}
+                </Link>
+              </div>
             </div>
           </div>
 
@@ -273,34 +170,32 @@ const interval = setInterval(() => {
                   placeholder="Recherche"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2.5 border border-[#006294] rounded-lg bg-white placeholder-[#C09200] focus:outline-none focus:ring-2 focus:ring-[#006294] text-base text-[#006294]"
+                  className="block w-full pl-10 pr-3 py-2.5 border border-[#006294] rounded-lg bg-white placeholder-[#C09200] focus:outline-none focus:ring-2 focus:ring-[#006294] text-base font-medium text-[#006294]"
                 />
               </div>
 
-            {searchResults.length > 0 ? (
-  <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
-    {searchResults.map((product) => (
-      <Link
-        key={product.id_product}
-        href={`/product/${product.name_product}`}
-        className="block px-4 py-2 text-gray-700 hover:bg-[#F2FAFD] hover:text-[#006294] transition-colors duration-150"
-     onClick={() => setSearchQuery("")}
-     >
-        {product.name_product}
-      </Link>
-    ))}
-  </div>
-) : (
-  searchQuery.trim() !== "" && (
-    <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 px-4 py-2 text-gray-500">
-      Aucun résultat trouvé
-    </div>
-  )
-)}
-
+              {searchResults.length > 0 ? (
+                <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                  {searchResults.map((product) => (
+                    <Link
+                      key={product.id_product}
+                      href={`/product/${product.name_product}`}
+                      className="block px-4 py-2 text-gray-700 hover:bg-[#F2FAFD] hover:text-[#006294] transition-colors duration-150 font-medium"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      {product.name_product}
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                searchQuery.trim() !== "" && (
+                  <div className="absolute mt-1 w-full bg-white border border-gray-200 rounded-lg shadow-lg z-50 px-4 py-2 text-gray-500 text-sm font-normal">
+                    Aucun résultat trouvé
+                  </div>
+                )
+              )}
             </div>
           )}
-
         </div>
       </header>
 

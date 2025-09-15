@@ -1,9 +1,10 @@
 "use client"
 
+import { useState, useEffect } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Edit, Trash2, Users, DollarSign, Image as ImageIcon } from "lucide-react"
+import { Edit, Trash2, Image as ImageIcon } from "lucide-react"
 
 type OptionType = {
   name_option: string
@@ -17,9 +18,29 @@ interface OptionDashboardProps {
   options: OptionType[]
   onEdit: (option: OptionType) => void
   onDelete: (option: OptionType) => void
+  loading?: boolean
+  error?: string | null
 }
 
-export function OptionDashboardTable({ options, onEdit, onDelete }: OptionDashboardProps) {
+export function OptionDashboardTable({
+  options,
+  onEdit,
+  onDelete,
+  loading = false,
+  error = null,
+}: OptionDashboardProps) {
+  if (loading) {
+    return <div className="text-center py-8">Loading options...</div>
+  }
+
+  if (error) {
+    return <div className="text-center py-8 text-red-500">error</div>
+  }
+
+  if (options.length === 0) {
+    return <div className="text-center py-8 text-muted-foreground">No options found.</div>
+  }
+
   return (
     <div className="space-y-4">
       {options.map((option, index) => (
@@ -28,9 +49,8 @@ export function OptionDashboardTable({ options, onEdit, onDelete }: OptionDashbo
             <div className="flex items-center justify-between">
               {/* Image + Title */}
               <div className="flex items-center space-x-4">
-                
-                <div className="w-20 h-20 bg-primary/10  flex items-center justify-center">
-                   {option.image_option ? (
+                <div className="w-20 h-20 bg-primary/10 flex items-center justify-center rounded-md overflow-hidden">
+                  {option.image_option ? (
                     <img
                       src={option.image_option}
                       alt={option.name_option}
@@ -44,14 +64,13 @@ export function OptionDashboardTable({ options, onEdit, onDelete }: OptionDashbo
                   <CardTitle className="text-lg">{option.name_option}</CardTitle>
                   <p className="text-sm text-muted-foreground">{option.description_option}</p>
                 </div>
-               
               </div>
 
               {/* Actions */}
               <div className="flex items-center space-x-2">
-                {option.prix  && (
+                {option.prix && (
                   <Badge variant="outline" className="flex items-center space-x-1">
-                    <span className="text-sm">prix :</span>
+                    <span className="text-sm">Prix:</span>
                     <span>{option.prix} MAD</span>
                   </Badge>
                 )}
@@ -70,17 +89,14 @@ export function OptionDashboardTable({ options, onEdit, onDelete }: OptionDashbo
             </div>
           </CardHeader>
 
-          <CardContent>
-            <div className="grid gap-4 md:grid-cols-2">
-              
-              {option.prix &&(
-                <div className="flex items-center space-x-2">
-                  <span className="text-sm">Prix</span>
-                  <span className="text-sm font-bold text-primary">{option.prix} MAD</span>
-                </div>
-              )}
-            </div>
-          </CardContent>
+          {option.prix && (
+            <CardContent>
+              <div className="flex items-center space-x-2">
+                <span className="text-sm">Prix</span>
+                <span className="text-sm font-bold text-primary">{option.prix} MAD</span>
+              </div>
+            </CardContent>
+          )}
         </Card>
       ))}
     </div>

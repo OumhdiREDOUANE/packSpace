@@ -6,6 +6,7 @@ export default async function AllHeader(){
   next: { revalidate: 60 }
 });
 const response = await res.json();
+console.log(response.data)
 const navItems = response.data.map((category) => {
   // نبني dropdown فارغ
   let dropdown = [];
@@ -15,7 +16,7 @@ const navItems = response.data.map((category) => {
     dropdown.push({
       name: group.name_group,
       isGroup: true,
-      children: group.products.map((product) => ({
+      children: group?.products?.map((product) => ({
         name: product.name_product,
         href: `/product/${product.id_product}`,
       })),
@@ -23,7 +24,7 @@ const navItems = response.data.map((category) => {
   });
 
   // نضيف المنتجات اللي ماعندهاش مجموعة
-  category.products.forEach((product) => {
+  category.products?.forEach((product) => {
     dropdown.push({
       name: product.name_product,
       href: `/product/${product.id_product}`,

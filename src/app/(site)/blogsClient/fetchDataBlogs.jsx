@@ -29,7 +29,7 @@ export default function BlogPage({ regularPosts }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen p-8">
+      <div className="min-h-screen p-8 font-inter">
         <Skeleton height={40} width={200} className="mb-6" />
         <div className="grid md:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
@@ -51,18 +51,16 @@ export default function BlogPage({ regularPosts }) {
 
   if (!blogs || blogs.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
+      <div className="min-h-screen flex items-center justify-center text-gray-500 font-inter">
         Aucune donnée disponible pour le moment.
       </div>
     );
   }
 
-  // Featured is the first element
   const [featuredPost, ...normalPosts] = blogs;
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Featured Post */}
+    <div className="min-h-screen bg-background font-inter">
       {featuredPost && (
         <section className="container mx-auto px-4 py-8">
           <div className="relative overflow-hidden rounded-lg bg-card border-border">
@@ -77,20 +75,20 @@ export default function BlogPage({ regularPosts }) {
               <div className="absolute inset-0 flex items-center">
                 <div className="container mx-auto px-8">
                   <div className="max-w-2xl text-white">
-                    <Badge className="mb-4 bg-[#006294] hover:bg-[#C09200] text-white ">
+                    <Badge className="mb-4 font-inter font-medium">
                       {featuredPost.category}
                     </Badge>
-                    <h1 className="text-3xl md:text-4xl font-bold mb-4 text-balance">
+                    <h1 className="text-3xl md:text-4xl font-bold mb-4 font-inter">
                       {featuredPost.title}
                     </h1>
-                    <p className="text-lg leading-relaxed mb-6 text-white/90">
+                    <p className="text-lg leading-relaxed mb-6 font-inter font-normal text-white/90">
                       {expandedArticles.includes(featuredPost.id)
                         ? featuredPost.content
                         : featuredPost.excerpt}
                     </p>
                     <Button
                       onClick={() => toggleArticle(featuredPost.id)}
-                      className="bg-[#006294] hover:bg-[#C09200] text-white"
+                      className="font-inter font-medium"
                     >
                       {expandedArticles.includes(featuredPost.id)
                         ? "Réduire ←"
@@ -104,7 +102,6 @@ export default function BlogPage({ regularPosts }) {
         </section>
       )}
 
-      {/* Articles Grid */}
       <section className="container mx-auto px-4 py-8">
         <div className="grid md:grid-cols-3 gap-6">
           {normalPosts.map((post) => (
@@ -121,26 +118,26 @@ export default function BlogPage({ regularPosts }) {
                 />
               </div>
               <CardHeader>
-                <div className="flex items-center justify-between mb-2">
-                  <Badge variant="secondary" className="text-xs">
+                <div className="flex items-center justify-between mb-2 font-inter font-medium">
+                  <Badge variant="secondary" className="text-xs font-inter font-medium">
                     {post.category}
                   </Badge>
-                  <span className="text-xs text-muted-foreground">
+                  <span className="text-xs text-muted-foreground font-inter font-normal">
                     {post.author}
                   </span>
                 </div>
-                <CardTitle className="text-xl text-card-foreground text-balance">
+                <CardTitle className="text-xl font-inter font-semibold">
                   {post.title}
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-gray-500 leading-relaxed mb-4">
+                <CardDescription className="text-gray-500 leading-relaxed mb-4 font-inter font-normal">
                   {expandedArticles.includes(post.id) ? post.content : post.excerpt}
                 </CardDescription>
                 <Button
                   onClick={() => toggleArticle(post.id)}
                   variant="outline"
-                  className="bg-[#006294] hover:bg-[#C09200] text-white "
+                  className="font-inter font-medium"
                 >
                   {expandedArticles.includes(post.id) ? "Réduire ←" : "Lire plus →"}
                 </Button>

@@ -1,6 +1,6 @@
+
 @import 'tailwindcss';
 @import 'tw-animate-css';
-
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -121,3 +121,9 @@
     @apply bg-background text-foreground;
   }
 }
+/* globals.css */
+
+
+/* html {
+  font-family: 'Helvetica Condensed', sans-serif;
+} */
