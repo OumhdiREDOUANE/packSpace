@@ -7,12 +7,14 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\Categorie;
 use App\Models\ProductOption;
 use App\Models\ImageProduct;
+use App\Models\Group;
+
 
 class Product extends Model
 {
     /** @use HasFactory<\Database\Factories\ProductFactory> */
     use HasFactory;
-    protected $fillable =['name_product','categorie_id','image',"description_product"];
+    protected $fillable =['name_product','categorie_id','image',"description_product","group_id"];
     protected $primaryKey = 'id_product';
  
 

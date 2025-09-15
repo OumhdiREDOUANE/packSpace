@@ -15,11 +15,10 @@ class Group extends Model
     protected $fillable = ['name_group', 'description_group', 'categorie_id'];
 
     // كل مجموعة تنتمي إلى صنف
-    public function categorie()
+  public function category()
     {
         return $this->belongsTo(Categorie::class, 'categorie_id', 'id_categorie');
     }
-
     // كل مجموعة تحتوي على منتجات
     public function products()
     {

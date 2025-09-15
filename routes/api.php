@@ -13,6 +13,7 @@ use App\Http\Controllers\ProrieterDashboardController;
 use App\Http\Controllers\OptionDashboardController;
 use App\Http\Controllers\CartDashboardController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\GroupController;
 
 
 use App\Http\Controllers\OrderDashboardController;
@@ -30,6 +31,8 @@ Route::apiResource('/categoryDashboard', CategoryController::class);
 Route::apiResource('/OrderDashboard', OrderDashboardController::class);
 Route::get('/product/topProducts',[ProductController::class,'topProducts']);
 Route::apiResource('/product', ProductController::class);
+Route::apiResource('/groupsDashboard', GroupController::class);
+
 Route::apiResource('/blogs', BlogController::class);
 Route::apiResource('/productDashboard', ProductDashboardController::class);
 Route::apiResource('/proprieterDashboard', ProrieterDashboardController::class);

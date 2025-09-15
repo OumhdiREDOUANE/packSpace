@@ -13,7 +13,7 @@ class ProductDashboardController extends Controller
     public function index()
     {
         return ProductsOfCategorieDashboardResource::collection(
-            Product::with(['categorie','images'])->get()
+            Product::with(['categorie','images','group'])->get()
         );
     }
 
@@ -21,8 +21,10 @@ class ProductDashboardController extends Controller
     {
         $data = $request->validate([
             'name_product' => 'required|string|max:255',
-            'description_product' => 'required|nullable|string',
+            'description_product' => 'required|string',
             'categorie_id' => 'required|exists:categories,id_categorie',
+            'group_id' => 'nullable|exists:groups,id_group',
+
             'images.*' => 'image|mimes:jpg,jpeg,png|max:2048'
             
             
@@ -55,7 +57,7 @@ class ProductDashboardController extends Controller
 
     public function show(Product $product)
     {
-        return new ProductsOfCategorieDashboardResource($product->load(['categorie','images']));
+        return new ProductsOfCategorieDashboardResource($product->load(['categorie','images','group']));
     }
 
     public function update(Request $request, $id)
@@ -64,8 +66,10 @@ class ProductDashboardController extends Controller
 
         $data = $request->validate([
             'name_product' => 'required|string|max:255',
-            'description_product' => 'required|nullable|string',
+            'description_product' => 'required|string',
             'categorie_id' => 'required|exists:categories,id_categorie',
+            'group_id' => 'nullable|exists:groups,id_group',
+
             'images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 

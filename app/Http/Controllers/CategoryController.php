@@ -23,18 +23,12 @@ class CategoryController extends Controller
         ]);
 
         if ($request->hasFile('image')) {
-            $cloudinary = new Cloudinary([
-                'cloud' => [
-                    'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                    'api_key'    => env('CLOUDINARY_API_KEY'),
-                    'api_secret' => env('CLOUDINARY_API_SECRET'),
-                ],
-                'url' => ['secure' => true],
-            ]);
+           $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
             $image=$request->file('image');
             
-            $uploadedFileUrl = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
-            $validated['url'] = $uploadedFileUrl;
+            $uploadResult = $cloudinary->uploadApi()->upload($image->getRealPath());
+    $validated['url'] = $uploadResult['secure_url'];
+    $validated['public_id'] = $uploadResult['public_id'];
             $category = Categorie::create($validated);
            
         }
@@ -61,18 +55,16 @@ class CategoryController extends Controller
 
     // إذا تم رفع صورة جديدة
     if ($request->hasFile('image')) {
-        $cloudinary = new Cloudinary([
-            'cloud' => [
-                'cloud_name' => env('CLOUDINARY_CLOUD_NAME'),
-                'api_key'    => env('CLOUDINARY_API_KEY'),
-                'api_secret' => env('CLOUDINARY_API_SECRET'),
-            ],
-            'url' => ['secure' => true],
-        ]);
 
+       $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
+       if ($category->public_id) {
+                $cloudinary->uploadApi()->destroy($category->public_id);
+            }
         $image = $request->file('image'); // ملف واحد
-        $uploadedFileUrl = $cloudinary->uploadApi()->upload($image->getRealPath())['secure_url'];
-        $validated['url'] = $uploadedFileUrl;
+        $uploadResult = $cloudinary->uploadApi()->upload($image->getRealPath());
+        $validated['url'] = $uploadResult['secure_url'];
+
+        $validated['public_id'] = $uploadResult['public_id'];
     }
 
     // تحديث الفئة
@@ -89,6 +81,10 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $category = Categorie::findOrFail($id);
+         if ($category->public_id) {
+        $cloudinary = new Cloudinary(env('CLOUDINARY_URL'));
+        $cloudinary->uploadApi()->destroy($category->public_id);
+    }
         $category->delete();
         return response()->json(['message' => 'Category deleted successfully']);
     }

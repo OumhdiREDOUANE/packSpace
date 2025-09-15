@@ -20,8 +20,11 @@ class ProductsOfCategorieDashboardResource extends JsonResource
                 'id_product'    => $this->id_product,
                 'name_product'  => $this->name_product,
                 'description_product' => $this->description_product,
-                'categorie_id'  => $this->categorie_id, // عشان يتطابق مع الـ interface
+                'categorie_id'  => $this->categorie_id,
+                'group_id'  => $this->group_id, // عشان يتطابق مع الـ interface
                 'categorie'     => $this->categorie?->name_categorie,
+                'group'     => $this->group?->name_group,
+
                 'images'        => ImageProductResource::collection($this->whenLoaded('images')), // غيرت الاسم images
             ];
                 

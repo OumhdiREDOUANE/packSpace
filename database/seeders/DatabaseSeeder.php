@@ -22,14 +22,7 @@ class DatabaseSeeder extends Seeder
         // ]);
         $this->call([
             UserSeeder::class,
-            CategorieSeeder::class,
-            ProductSeeder::class,
-            ProprieterSeeder::class,
-            OptionSeeder::class,
-            ProductOptionSeeder::class,
-
-            PanierSeeder::class,
-            PanierValiderSeeder::class,
+            
            
         ]);
     }

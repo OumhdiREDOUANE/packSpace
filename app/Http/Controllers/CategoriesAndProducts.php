@@ -24,17 +24,53 @@ class CategoriesAndProducts extends Controller
     //   return CategoryResource::collection($categories);
             
     // }
-       public function index()
+  
+public function index()
 {
     $categories = Categorie::with([
-        'groups.products',   // كل صنف يجيب المجموعات والمنتجات ديالها
-        'products'           // المنتجات اللي ماعندهاش مجموعة
-    ])->get();
+    'groups' => function ($q) {
+        $q->select('id_group', 'name_group', 'categorie_id')
+          ->with([
+              'products:id_product,name_product,group_id'
+          ]);
+    },
+    'products' => function($q) { // منتجات بدون مجموعة
+        $q->select('id_product','name_product','categorie_id')
+          ->whereNull('group_id');
+    }
+])
+->select('id_categorie', 'name_categorie')
+->get()
+->map(function ($categorie) {
+    return [
+        'id_categorie'   => $categorie->id_categorie,
+        'name_categorie' => $categorie->name_categorie,
+        'groups'         => $categorie->groups->map(function ($group) {
+            return [
+                'id_group'   => $group->id_group,
+                'name_group' => $group->name_group,
+                'products'   => $group->products->map(function ($product) {
+                    return [
+                        'id_product'   => $product->id_product,
+                        'name_product' => $product->name_product,
+                    ];
+                })
+            ];
+        }),
+        'products' => $categorie->products->map(function ($product) {
+            return [
+                'id_product'   => $product->id_product,
+                'name_product' => $product->name_product,
+            ];
+        })
+    ];
+});
 
-    return response()->json([
-        'data' => $categories
-    ]);
-} 
+return response()->json(['data' => $categories]);
+
+   
+}
+
         
     
 public function topProducts()
