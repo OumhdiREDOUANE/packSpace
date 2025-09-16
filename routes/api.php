@@ -41,7 +41,9 @@ Route::apiResource('/optionDashboard', OptionDashboardController::class);
 Route::apiResource('/CartDashboard', CartDashboardController::class)->middleware('auth:sanctum');
 Route::apiResource('FaqDashboard', FaqDashboardController::class);
 Route::apiResource('BlogDashboard', BlogDashboardController::class);
-Route::post('/product', [ProductController::class,"store"]);
+// Route::post('/product', [ProductController::class,"store"]);
+// Route::put('/product/{id}', [ProductController::class, "update"]);
+
 Route::apiResource('/cart', PanierController::class)->only("show")->middleware('auth:sanctum');
 Route::delete('/cart/notLogin/{id}', [PanierController::class, 'destroy']);
 Route::apiResource('/faqs', FaqController::class);

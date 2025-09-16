@@ -41,7 +41,7 @@ class PanierResource extends JsonResource
         'id_orderProduct' => $this->id_orderProduct,
         'uuid'=>$this->uuid,
 
-        'prix_total' => $this->productOptions->sum('prix'),
+        'prix_total' => $this->prix_orderProduct,
 
         'product' => [
             'id_product' => $product->id_product,

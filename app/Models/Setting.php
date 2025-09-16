@@ -11,6 +11,8 @@ class Setting extends Model
         'contact_phone',
         'contact_whatsapp',
         'contact_email',
+        "url_image_hero",
+        "public_id",
         'promo_code',
     ];
 }

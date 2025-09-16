@@ -15,6 +15,9 @@ return new class extends Migration {
             $table->string('contact_whatsapp');
             $table->string('contact_email');
             $table->string('promo_code');
+            $table->string('url_image_hero');
+            $table->string('public_id');
+
             $table->timestamps();
         });
     }

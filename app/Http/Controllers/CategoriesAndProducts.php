@@ -39,12 +39,14 @@ public function index()
           ->whereNull('group_id');
     }
 ])
-->select('id_categorie', 'name_categorie')
+->select('id_categorie', 'name_categorie',"url")
 ->get()
 ->map(function ($categorie) {
     return [
         'id_categorie'   => $categorie->id_categorie,
         'name_categorie' => $categorie->name_categorie,
+        'url' => $categorie->url,
+
         'groups'         => $categorie->groups->map(function ($group) {
             return [
                 'id_group'   => $group->id_group,

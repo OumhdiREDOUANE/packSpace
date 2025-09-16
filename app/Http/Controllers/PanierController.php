@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use App\Models\OrderProduct;
+use App\Models\OrderProductProductOption;
 
 
 use App\Http\Resources\PanierResource;
@@ -185,13 +186,11 @@ public function CountCartNotLogin(Request $request){
         //
     }
 
+
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+   
 
     /**
      * Remove the specified resource from storage.

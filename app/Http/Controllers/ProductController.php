@@ -180,7 +180,7 @@ public function update(Request $request, $id)
 
     // نجيب order ديال هاد session والـ id
     $order = OrderProduct::where('id_orderProduct', $id)
-        ->where('session_user', $sessionId)
+        
         ->firstOrFail();
 OrderProduct::where('id_orderProduct', $id)
     ->update(['prix_orderProduct' =>$request->prix_orderProduct ]);
@@ -209,7 +209,6 @@ OrderProduct::where('id_orderProduct', $id)
         "options" => $validated
     ]);
 }
-
 
 //     public function show($id)
 // {
